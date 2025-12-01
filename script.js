@@ -1,59 +1,63 @@
 const body = document.body;
 const instruction = document.getElementById('instruction');
+const startStopBtn = document.getElementById('start-stop-btn');
 let timer;
-// Random delay will be between 1000 milliseconds (1 second) and 3000 milliseconds (3 seconds)
+let isRunning = false;
 const minDelay = 1000; 
 const maxDelay = 3000; 
 
-function toggleFullscreen() {
-    // If not in fullscreen, request it
-    if (!document.fullscreenElement) {
-        body.requestFullscreen().catch(err => {
-            console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-        });
-        instruction.textContent = 'Get Ready...';
-        
-        // Start the game loop after a short initial delay
-        // Clear any existing timer just in case
-        clearInterval(timer); 
-        timer = setTimeout(changeSignal, 2000); // 2-second countdown before first signal
-        
+// --- Signal Controls ---
+
+function startSignals() {
+    if (isRunning) return; 
+    isRunning = true;
+    startStopBtn.textContent = 'Pause';
+    instruction.textContent = 'GET READY';
+    
+    // Start the first signal after a short delay
+    timer = setTimeout(changeSignal, 1500); 
+}
+
+function stopSignals() {
+    clearTimeout(timer);
+    isRunning = false;
+    startStopBtn.textContent = 'Start';
+    // Reset to black and show PAUSED state
+    body.style.backgroundColor = 'black'; 
+    instruction.textContent = 'PAUSED';
+}
+
+function toggleSignals() {
+    if (isRunning) {
+        stopSignals();
     } else {
-        // If in fullscreen, exit it
-        document.exitFullscreen();
-        clearInterval(timer);
-        body.style.backgroundColor = 'black';
-        instruction.textContent = 'Click to Start Fullscreen';
+        startSignals();
     }
 }
 
 function changeSignal() {
-    // 50% chance of Red (Mix Up)
+    if (!isRunning) return;
+
+    // 50/50 chance
     const isRed = Math.random() < 0.5; 
     
     if (isRed) {
-        // RED: MIX UP (Feint, change combo)
+        // RED: MIX UP (Feint)
         body.style.backgroundColor = 'red';
         instruction.textContent = 'MIX UP';
     } else {
-        // GREEN: COMMIT (Let attack fly, finish combo)
+        // GREEN: COMMIT (Let fly)
         body.style.backgroundColor = 'green';
         instruction.textContent = 'COMMIT';
     }
 
-    // Calculate a random delay between minDelay and maxDelay
+    // Set a new random delay
     const nextDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
     
-    // Clear and restart the timer with the new, random delay
-    clearInterval(timer);
+    // Clear and schedule the next signal
+    clearTimeout(timer);
     timer = setTimeout(changeSignal, nextDelay);
 }
 
-// Optional: Stop the timer if the user manually exits fullscreen (e.g., using ESC key)
-document.addEventListener('fullscreenchange', function () {
-    if (!document.fullscreenElement) {
-        clearInterval(timer);
-        body.style.backgroundColor = 'black';
-        instruction.textContent = 'Click to Start Fullscreen';
-    }
-});
+// --- Initialization: Automatically start the signals on page load ---
+startSignals();
