@@ -1,6 +1,8 @@
 const body = document.body;
 const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
+// NEW: Get the signal box element
+const signalBox = document.getElementById('signal-box'); 
 let timer;
 let isRunning = false;
 const minDelay = 1000; 
@@ -9,22 +11,15 @@ const maxDelay = 5000;
 let lastChoiceWasRed = null; 
 let consecutiveDuration = 0; 
 
-// --- Fullscreen Toggle (FIXED) ---
+// --- Fullscreen Toggle ---
 
 function toggleFullscreen() {
-    // Check if we are currently in fullscreen mode
+    // Request fullscreen on the signal box instead of the body
     if (!document.fullscreenElement) {
-        // Request fullscreen on the body element
-        body.requestFullscreen().catch(err => {
+        signalBox.requestFullscreen().catch(err => {
             console.error(`Error enabling fullscreen: ${err.message}`);
         });
-        
-        // **FIX:** When entering fullscreen, explicitly make the current body background color
-        // stay true. The browser sometimes overrides the body color on fullscreen entry.
-        // We'll trust the running signals to keep the color up-to-date.
-
     } else {
-        // Exit fullscreen
         document.exitFullscreen();
     }
 }
@@ -47,7 +42,10 @@ function stopSignals() {
     clearTimeout(timer);
     isRunning = false;
     startStopBtn.textContent = 'Start';
-    body.style.backgroundColor = 'black'; 
+    
+    // Target the signal box to reset color
+    signalBox.style.backgroundColor = 'black'; 
+    
     instruction.textContent = 'PAUSED';
     
     lastChoiceWasRed = null; 
@@ -71,18 +69,13 @@ function changeSignal() {
     // Check if the 5-second consecutive rule needs to be enforced
     if (lastChoiceWasRed !== null && consecutiveDuration + nextDelay > 5000) {
         
-        // Rule enforced: Force the opposite signal
         nextIsRed = !lastChoiceWasRed; 
-        
-        // Reset the duration for the new signal
         consecutiveDuration = 0; 
         
     } else {
         
-        // Rule not enforced: Use pure 50/50 randomization
         nextIsRed = Math.random() < 0.5;
         
-        // Update consecutive duration
         if (nextIsRed === lastChoiceWasRed) {
             consecutiveDuration += nextDelay;
         } else {
@@ -93,14 +86,15 @@ function changeSignal() {
     // --- Update the display ---
 
     if (nextIsRed) {
-        body.style.backgroundColor = 'red';
+        // Target the signal box to change color
+        signalBox.style.backgroundColor = 'red';
         instruction.textContent = 'MIX UP';
     } else {
-        body.style.backgroundColor = 'green';
+        // Target the signal box to change color
+        signalBox.style.backgroundColor = 'green';
         instruction.textContent = 'COMMIT';
     }
 
-    // Update tracking variables for the next cycle
     lastChoiceWasRed = nextIsRed;
 
     // --- Schedule the next signal ---
