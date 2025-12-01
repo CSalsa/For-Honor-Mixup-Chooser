@@ -2,7 +2,7 @@ body {
     margin: 0;
     overflow: hidden;
     height: 100vh;
-    /* Main body is a flex container for the signal-box and controls */
+    /* Body is a column flex container that centers its children */
     display: flex;
     flex-direction: column; 
     justify-content: center; /* Center content vertically */
@@ -12,24 +12,25 @@ body {
 }
 
 #signal-box {
+    /* Takes up all available space between the top and the controls */
     flex-grow: 1; 
     width: 100%;
-    /* Signal box is now a flex container for the instruction text */
+    /* Signal box is a flex container that centers the text */
     display: flex;
-    justify-content: center; /* Center text horizontally inside the box */
-    align-items: center; /* Center text vertically inside the box */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
 }
 
 #instruction {
-    /* Set color for contrast */
+    /* High contrast white text */
     color: white; 
     font-family: Arial, sans-serif;
-    /* Significantly increased font size */
+    /* Large font size for second monitor viewing */
     font-size: 8em; 
-    font-weight: bold; /* Added boldness for better visibility */
+    font-weight: bold; 
     text-align: center;
     user-select: none;
-    /* Add a subtle text shadow to help with contrast on varying shades */
+    /* Text shadow helps white contrast against both red and green */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
 }
 
@@ -38,7 +39,7 @@ body {
     background-color: #333;
     width: 100%;
     text-align: center;
-    /* Ensure controls don't overlap the signal box when centered */
+    /* Prevents controls from shrinking the signal box unexpectedly */
     flex-shrink: 0; 
 }
 
