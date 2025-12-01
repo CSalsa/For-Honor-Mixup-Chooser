@@ -2,25 +2,35 @@ body {
     margin: 0;
     overflow: hidden;
     height: 100vh;
-    /* Body now just sets up the structure and ensures full height */
+    /* Crucial for absolute positioning: establishes the context for #controls */
+    position: relative; 
+    
+    /* We make the body a full-screen display, but the signal-box covers it */
     display: flex;
     flex-direction: column; 
     justify-content: center; 
     align-items: center; 
-    background-color: black; /* Set a fallback color for the window frame */
+    background-color: transparent; /* Remove the body's default black background */
 }
 
 #signal-box {
-    flex-grow: 1; 
+    /* CRITICAL FIX: Make the signal box occupy 100% of the body's height */
+    position: absolute; 
+    top: 0;
+    left: 0;
+    height: 100vh; 
     width: 100%;
-    /* Signal box now handles the background color and transition */
+    
     display: flex;
     justify-content: center; 
     align-items: center; 
     transition: background-color 0.1s ease-in-out; 
+    z-index: 1; /* Keep it behind the controls */
 }
 
 #instruction {
+    /* Ensure text is above the controls' layer if needed */
+    z-index: 2; 
     color: white; 
     font-family: Arial, sans-serif;
     font-size: 8em; 
@@ -31,10 +41,13 @@ body {
 }
 
 #controls {
-    padding: 15px;
-    width: 100%;
+    /* Controls float on top of the signal box */
+    position: absolute; 
+    bottom: 15px; 
+    width: 100%; 
     text-align: center;
-    flex-shrink: 0; 
+    z-index: 1000; /* Always on top */
+    padding: 15px;
 }
 
 #controls button {
@@ -43,6 +56,6 @@ body {
     font-size: 1.5em;
     cursor: pointer;
     border: 3px solid white;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.4); 
     color: white;
 }
