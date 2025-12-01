@@ -1,7 +1,6 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <title>For Honor Mind Game Trainer</title>
+    <title>For Honor Mixup Maker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,8 +9,28 @@
         <h1 id="instruction">Loading...</h1>
     </div>
     <div id="controls">
-        <button id="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button> 
-        <button id="start-stop-btn" onclick="toggleSignals()">Pause</button>
+        <div id="config">
+            <div class="setting">
+                <label>Change Floor</label>
+                <div id="floor-display" class="delay-display">1.0</div>
+                <button id="floor-plus" onclick="changeDelay('floor', 500)">+</button>
+                <button id="floor-minus" onclick="changeDelay('floor', -500)">-</button>
+            </div>
+            <div class="setting">
+                <label>Change Ceiling</label>
+                <div id="ceiling-display" class="delay-display">5.0</div>
+                <button id="ceiling-plus" onclick="changeDelay('ceiling', 500)">+</button>
+                <button id="ceiling-minus" onclick="changeDelay('ceiling', -500)">-</button>
+            </div>
+        </div>
+        
+        <div id="main-buttons">
+            <button id="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button> 
+            <button id="start-stop-btn" onclick="toggleSignals()">Pause</button>
+        </div>
+        
+        <div id="probability-display">0%</div>
+        <div id="duration-timer">0.000</div>
     </div>
     <script src="script.js"></script>
 </body>
