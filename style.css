@@ -1,43 +1,82 @@
-body {
-    margin: 0;
-    overflow: hidden;
-    height: 100vh;
-    display: flex;
-    flex-direction: column; /* Allows content and controls to stack */
-    justify-content: center;
-    align-items: center;
-    background-color: black; 
-    transition: background-color 0.1s ease-in-out;
+const body = document.body;
+const instruction = document.getElementById('instruction');
+const startStopBtn = document.getElementById('start-stop-btn');
+let timer;
+let isRunning = false; // New state variable
+const minDelay = 1000; 
+const maxDelay = 3000; 
+
+// --- Fix 1: Separate Fullscreen from Game Logic ---
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        body.requestFullscreen().catch(err => {
+            console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
 }
 
-#signal-box {
-    /* Takes up most of the vertical space */
-    flex-grow: 1; 
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+// Optional: Stop the timer if the user manually exits fullscreen (e.g., using ESC key)
+document.addEventListener('fullscreenchange', function () {
+    if (!document.fullscreenElement) {
+        // If exiting fullscreen, you might want to stop the signals, 
+        // but for now, we'll let the user control it with the Pause button.
+    }
+});
+
+// --- Fix 2: Automatic Start and Pause/Play Control ---
+
+function startSignals() {
+    if (isRunning) return; // Prevent multiple timers
+    isRunning = true;
+    startStopBtn.textContent = 'Pause';
+    instruction.textContent = 'GET READY';
+    // Initial delay before the first signal appears
+    timer = setTimeout(changeSignal, 2000); 
 }
 
-#instruction {
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 4em;
-    text-align: center;
-    user-select: none;
+function stopSignals() {
+    clearInterval(timer);
+    isRunning = false;
+    startStopBtn.textContent = 'Start';
+    body.style.backgroundColor = 'black';
+    instruction.textContent = 'PAUSED';
 }
 
-#controls {
-    /* Small bar at the bottom for buttons */
-    padding: 10px;
-    background-color: #333;
-    width: 100%;
-    text-align: center;
+function toggleSignals() {
+    if (isRunning) {
+        stopSignals();
+    } else {
+        startSignals();
+    }
 }
 
-#controls button {
-    padding: 10px 20px;
-    margin: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
+function changeSignal() {
+    // Check if signals should run
+    if (!isRunning) return;
+
+    // 50% chance of Red (Mix Up)
+    const isRed = Math.random() < 0.5; 
+    
+    if (isRed) {
+        body.style.backgroundColor = 'red';
+        instruction.textContent = 'MIX UP';
+    } else {
+        body.style.backgroundColor = 'green';
+        instruction.textContent = 'COMMIT';
+    }
+
+    // Calculate a random delay between minDelay and maxDelay
+    const nextDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    
+    // Clear and restart the timer with the new, random delay
+    clearInterval(timer);
+    timer = setTimeout(changeSignal, nextDelay);
 }
+
+// Start the signals immediately when the page loads (Fix for the original issue)
+// This is now handled by the onload="startSignals()" in the HTML body tag,
+// but we keep this here as a fallback or if the onload attribute is missed.
+// startSignals();
