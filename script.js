@@ -206,14 +206,14 @@ function startSignals() {
     if (isRunning) return; 
     isRunning = true;
     startStopBtn.textContent = 'Pause';
-    instruction.textContent = 'GET READY';
+    instruction.textContent = 'STARTING';
     
     lastChoiceWasRed = null; 
     
     hideTimerDisplay();
     startCounter(); 
     
-    timer = setTimeout(changeSignal, 1500); 
+    timer = setTimeout(changeSignal, 500); 
 }
 
 function stopSignals() {
@@ -288,3 +288,4 @@ if (floorDisplay && ceilingDisplay) {
 }
 
 startSignals();
+
