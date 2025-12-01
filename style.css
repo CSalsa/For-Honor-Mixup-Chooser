@@ -5,36 +5,41 @@ body {
     /* Body is a column flex container that centers its children */
     display: flex;
     flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
     background-color: black; 
     transition: background-color 0.1s ease-in-out;
 }
 
 #signal-box {
+    /* Takes up all available space between the top and the controls */
     flex-grow: 1; 
     width: 100%;
     /* Signal box is a flex container that centers the text */
     display: flex;
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
 }
 
 #instruction {
+    /* High contrast white text */
     color: white; 
     font-family: Arial, sans-serif;
+    /* Large font size for second monitor viewing */
     font-size: 8em; 
     font-weight: bold; 
     text-align: center;
     user-select: none;
+    /* Text shadow helps white contrast against both red and green */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
 }
 
 #controls {
     padding: 15px; /* Increased padding */
-    /* REMOVED background-color: #333; to make it blend with the signal color */
+    /* REMOVED background-color: #333; */
     width: 100%;
     text-align: center;
+    /* Prevents controls from shrinking the signal box unexpectedly */
     flex-shrink: 0; 
 }
 
@@ -46,4 +51,23 @@ body {
     border: 3px solid white; /* Adding a high-contrast border */
     background-color: rgba(0, 0, 0, 0.4); /* Subtle, translucent background */
     color: white;
+}
+
+/* * THE CRITICAL FIX: 
+* Force the browser to apply the background color to the element 
+* that is currently in fullscreen mode. 
+*/
+body:-webkit-full-screen {
+    /* For Chrome/Safari/Edge */
+    background-color: inherit; 
+}
+
+body:-moz-full-screen {
+    /* For Firefox */
+    background-color: inherit;
+}
+
+body:fullscreen {
+    /* Standard CSS */
+    background-color: inherit;
 }
