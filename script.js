@@ -3,11 +3,23 @@ const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
 let timer;
 let isRunning = false;
-// Signals will appear randomly between 1 second and 3 seconds
 const minDelay = 1000; 
-const maxDelay = 3000; 
+const maxDelay = 5000; 
 
-// --- Signal Controls ---
+// --- Fullscreen Toggle (Now Independent) ---
+
+function toggleFullscreen() {
+    // This function only handles the browser window state.
+    if (!document.fullscreenElement) {
+        body.requestFullscreen().catch(err => {
+            console.error(`Error enabling fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// --- Signal Controls (Unaffected by Fullscreen) ---
 
 function startSignals() {
     if (isRunning) return; 
@@ -15,7 +27,6 @@ function startSignals() {
     startStopBtn.textContent = 'Pause';
     instruction.textContent = 'GET READY';
     
-    // Start the first signal after a short delay
     timer = setTimeout(changeSignal, 1500); 
 }
 
@@ -23,7 +34,6 @@ function stopSignals() {
     clearTimeout(timer);
     isRunning = false;
     startStopBtn.textContent = 'Start';
-    // Reset to black and show PAUSED state
     body.style.backgroundColor = 'black'; 
     instruction.textContent = 'PAUSED';
 }
@@ -39,27 +49,26 @@ function toggleSignals() {
 function changeSignal() {
     if (!isRunning) return;
 
-    // 50% chance of Red (Mix Up)
     const isRed = Math.random() < 0.5; 
     
     if (isRed) {
-        // RED: MIX UP (Feint, change combo)
         body.style.backgroundColor = 'red';
         instruction.textContent = 'MIX UP';
     } else {
-        // GREEN: COMMIT (Let attack fly, finish combo)
         body.style.backgroundColor = 'green';
         instruction.textContent = 'COMMIT';
     }
 
-    // Calculate a random delay between minDelay and maxDelay
     const nextDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
     
-    // Clear and schedule the next signal
     clearTimeout(timer);
     timer = setTimeout(changeSignal, nextDelay);
 }
 
-// --- Initialization: Automatically start the signals on page load ---
-// This runs as soon as the script is parsed, ensuring automatic start.
+// --- Initialization ---
+
+// REMOVED the document.addEventListener('fullscreenchange', ...) listener.
+// This ensures that hitting ESC or using the Full Screen button only changes the window size, 
+// and DOES NOT stop the signals.
+
 startSignals();
