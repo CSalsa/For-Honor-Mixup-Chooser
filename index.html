@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
-<body onclick="toggleFullscreen()">
+<body onload="startSignals()"> 
     <div id="signal-box">
-        <h1 id="instruction">Click to Start Fullscreen</h1>
+        <h1 id="instruction">Loading...</h1>
+    </div>
+    <div id="controls">
+        <button id="fullscreen-btn" onclick="toggleFullscreen()">Toggle Fullscreen</button>
+        <button id="start-stop-btn" onclick="toggleSignals()">Pause</button>
     </div>
     <script src="script.js"></script>
 </body>
