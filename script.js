@@ -3,6 +3,7 @@ const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
 let timer;
 let isRunning = false;
+// Signals will appear randomly between 1 second and 3 seconds
 const minDelay = 1000; 
 const maxDelay = 3000; 
 
@@ -38,20 +39,20 @@ function toggleSignals() {
 function changeSignal() {
     if (!isRunning) return;
 
-    // 50/50 chance
+    // 50% chance of Red (Mix Up)
     const isRed = Math.random() < 0.5; 
     
     if (isRed) {
-        // RED: MIX UP (Feint)
+        // RED: MIX UP (Feint, change combo)
         body.style.backgroundColor = 'red';
         instruction.textContent = 'MIX UP';
     } else {
-        // GREEN: COMMIT (Let fly)
+        // GREEN: COMMIT (Let attack fly, finish combo)
         body.style.backgroundColor = 'green';
         instruction.textContent = 'COMMIT';
     }
 
-    // Set a new random delay
+    // Calculate a random delay between minDelay and maxDelay
     const nextDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
     
     // Clear and schedule the next signal
@@ -60,4 +61,5 @@ function changeSignal() {
 }
 
 // --- Initialization: Automatically start the signals on page load ---
+// This runs as soon as the script is parsed, ensuring automatic start.
 startSignals();
