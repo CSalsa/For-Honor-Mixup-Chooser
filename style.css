@@ -2,35 +2,31 @@ body {
     margin: 0;
     overflow: hidden;
     height: 100vh;
-    /* Crucial for absolute positioning: establishes the context for #controls */
     position: relative; 
     
-    /* We make the body a full-screen display, but the signal-box covers it */
     display: flex;
     flex-direction: column; 
     justify-content: center; 
     align-items: center; 
-    background-color: transparent; /* Remove the body's default black background */
+    background-color: transparent; 
 }
 
 #signal-box {
-    /* CRITICAL FIX: Make the signal box occupy 100% of the body's height */
     position: absolute; 
     top: 0;
     left: 0;
     height: 100vh; 
     width: 100%;
+    background-color: black; 
     
     display: flex;
     justify-content: center; 
     align-items: center; 
     transition: background-color 0.1s ease-in-out; 
-    z-index: 1; /* Keep it behind the controls */
+    z-index: 1; 
 }
 
 #instruction {
-    /* Ensure text is above the controls' layer if needed */
-    z-index: 2; 
     color: white; 
     font-family: Arial, sans-serif;
     font-size: 8em; 
@@ -42,18 +38,65 @@ body {
 }
 
 #controls {
-    /* Controls float on top of the signal box */
-    position: absolute; 
-    bottom: 15px; 
+    position: fixed; 
+    bottom: 0; 
+    left: 0;
     width: 100%; 
-    text-align: center;
-    z-index: 1000; /* Always on top */
-    padding: 15px;
+    z-index: 1000; 
+    padding: 15px 30px; 
+    
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    box-sizing: border-box; 
 }
 
-#controls button {
+/* --- Main Button Styling (Full Screen/Pause) --- */
+#main-buttons {
+    display: flex;
+    justify-content: center; 
+    flex-grow: 1; 
+}
+
+#main-buttons button {
     padding: 15px 30px;
     margin: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border: 3px solid white;
+    background-color: rgba(0, 0, 0, 0.4); 
+    color: white;
+}
+
+/* --- Config Panel Styling --- */
+#config {
+    display: flex;
+    gap: 30px; 
+}
+
+.setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.setting label {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.delay-display {
+    font-family: monospace;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+/* Styling for the small +/- buttons */
+.setting button {
+    padding: 5px 15px; 
+    margin: 3px;
     font-size: 1.5em;
     cursor: pointer;
     border: 3px solid white;
