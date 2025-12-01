@@ -1,7 +1,6 @@
 const body = document.body;
 const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
-// NEW: Get the signal box element
 const signalBox = document.getElementById('signal-box'); 
 let timer;
 let isRunning = false;
@@ -11,12 +10,12 @@ const maxDelay = 5000;
 let lastChoiceWasRed = null; 
 let consecutiveDuration = 0; 
 
-// --- Fullscreen Toggle ---
+// --- Fullscreen Toggle (Targeting body again) ---
 
 function toggleFullscreen() {
-    // Request fullscreen on the signal box instead of the body
+    // Request fullscreen on the body element, which contains all elements
     if (!document.fullscreenElement) {
-        signalBox.requestFullscreen().catch(err => {
+        body.requestFullscreen().catch(err => {
             console.error(`Error enabling fullscreen: ${err.message}`);
         });
     } else {
