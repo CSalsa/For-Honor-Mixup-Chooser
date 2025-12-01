@@ -1,10 +1,3 @@
-That's because the CSS needs a few adjustments to properly center the elements both horizontally and vertically, and we need to explicitly set the text color to ensure contrast.
-
-Here are the revised contents for your style.css to fix the alignment and text size:
-
-1. 🎨 Revised style.css (Fixing Alignment and Contrast)
-CSS
-
 body {
     margin: 0;
     overflow: hidden;
