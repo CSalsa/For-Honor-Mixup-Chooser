@@ -4,8 +4,6 @@ const startStopBtn = document.getElementById('start-stop-btn');
 const signalBox = document.getElementById('signal-box'); 
 let timer;
 let isRunning = false;
-const minDelay = 1000; 
-const maxDelay = 5000; 
 
 let lastChoiceWasRed = null; 
 let consecutiveDuration = 0; 
@@ -29,7 +27,9 @@ function startSignals() {
     if (isRunning) return; 
     isRunning = true;
     startStopBtn.textContent = 'Pause';
-    instruction.textContent = 'GET READY';
+    instruction.textContent = 'STARTING';
+    
+    lastChoiceWasRed = null; 
     
     lastChoiceWasRed = null; 
     consecutiveDuration = 0;
@@ -39,6 +39,7 @@ function startSignals() {
 
 function stopSignals() {
     clearTimeout(timer);
+    stopCounter(); 
     isRunning = false;
     startStopBtn.textContent = 'Start';
     
@@ -59,7 +60,7 @@ function toggleSignals() {
     }
 }
 
-function changeSignal() {
+function changeSignal(forceSwitch = false) {
     if (!isRunning) return;
 
     let nextIsRed;
@@ -98,9 +99,22 @@ function changeSignal() {
 
     // --- Schedule the next signal ---
     
+    if (nextIsRed) {
+        signalBox.style.backgroundColor = 'red';
+        instruction.textContent = INSTRUCTION_MIXUP;
+    } else {
+        signalBox.style.backgroundColor = 'green';
+        instruction.textContent = INSTRUCTION_COMMIT;
+    }
+    
+    showTimerDisplay();
+    lastChoiceWasRed = nextIsRed;
+
     clearTimeout(timer);
     timer = setTimeout(changeSignal, nextDelay);
 }
 
+// 
 // --- Initialization ---
 startSignals();
+

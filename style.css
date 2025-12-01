@@ -38,6 +38,7 @@ body {
     text-align: center;
     user-select: none;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
+    z-index: 3; 
 }
 
 #controls {
@@ -58,4 +59,18 @@ body {
     border: 3px solid white;
     background-color: rgba(0, 0, 0, 0.4); 
     color: white;
+    width: 70px; 
+    box-sizing: border-box;
+}
+
+/* --- Validation Output Styling (Single Line on Right) --- */
+#probability-display, #duration-timer {
+    position: static; 
+    margin-left: 10px; 
+    padding: 0;
+    font-size: 14px; 
+    color: white; 
+    font-family: monospace; 
+    z-index: 1001; 
+    visibility: hidden;
 }
