@@ -1,63 +1,41 @@
-const body = document.body;
-const instruction = document.getElementById('instruction');
-const startStopBtn = document.getElementById('start-stop-btn');
-let timer;
-let isRunning = false;
-const minDelay = 1000; 
-const maxDelay = 3000; 
-
-// --- Signal Controls ---
-
-function startSignals() {
-    if (isRunning) return; 
-    isRunning = true;
-    startStopBtn.textContent = 'Pause';
-    instruction.textContent = 'GET READY';
-    
-    // Start the first signal after a short delay
-    timer = setTimeout(changeSignal, 1500); 
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: black; 
+    transition: background-color 0.1s ease-in-out;
 }
 
-function stopSignals() {
-    clearTimeout(timer);
-    isRunning = false;
-    startStopBtn.textContent = 'Start';
-    // Reset to black and show PAUSED state
-    body.style.backgroundColor = 'black'; 
-    instruction.textContent = 'PAUSED';
+#signal-box {
+    flex-grow: 1; 
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-function toggleSignals() {
-    if (isRunning) {
-        stopSignals();
-    } else {
-        startSignals();
-    }
+#instruction {
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 4em;
+    text-align: center;
+    user-select: none;
 }
 
-function changeSignal() {
-    if (!isRunning) return;
-
-    // 50/50 chance
-    const isRed = Math.random() < 0.5; 
-    
-    if (isRed) {
-        // RED: MIX UP (Feint)
-        body.style.backgroundColor = 'red';
-        instruction.textContent = 'MIX UP';
-    } else {
-        // GREEN: COMMIT (Let fly)
-        body.style.backgroundColor = 'green';
-        instruction.textContent = 'COMMIT';
-    }
-
-    // Set a new random delay
-    const nextDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-    
-    // Clear and schedule the next signal
-    clearTimeout(timer);
-    timer = setTimeout(changeSignal, nextDelay);
+#controls {
+    padding: 10px;
+    background-color: #333;
+    width: 100%;
+    text-align: center;
 }
 
-// --- Initialization: Automatically start the signals on page load ---
-startSignals();
+#controls button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+}
