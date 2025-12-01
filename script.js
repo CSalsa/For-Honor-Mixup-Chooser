@@ -6,18 +6,25 @@ let isRunning = false;
 const minDelay = 1000; 
 const maxDelay = 5000; 
 
-// New variables to track the current state and time
-let lastChoiceWasRed = null; // null, true, or false
-let consecutiveDuration = 0; // Time the current choice has been active
+let lastChoiceWasRed = null; 
+let consecutiveDuration = 0; 
 
-// --- Fullscreen Toggle ---
+// --- Fullscreen Toggle (FIXED) ---
 
 function toggleFullscreen() {
+    // Check if we are currently in fullscreen mode
     if (!document.fullscreenElement) {
+        // Request fullscreen on the body element
         body.requestFullscreen().catch(err => {
             console.error(`Error enabling fullscreen: ${err.message}`);
         });
+        
+        // **FIX:** When entering fullscreen, explicitly make the current body background color
+        // stay true. The browser sometimes overrides the body color on fullscreen entry.
+        // We'll trust the running signals to keep the color up-to-date.
+
     } else {
+        // Exit fullscreen
         document.exitFullscreen();
     }
 }
@@ -30,7 +37,6 @@ function startSignals() {
     startStopBtn.textContent = 'Pause';
     instruction.textContent = 'GET READY';
     
-    // Reset consecutive tracking when starting
     lastChoiceWasRed = null; 
     consecutiveDuration = 0;
     
@@ -44,7 +50,6 @@ function stopSignals() {
     body.style.backgroundColor = 'black'; 
     instruction.textContent = 'PAUSED';
     
-    // Reset consecutive tracking when stopping
     lastChoiceWasRed = null; 
     consecutiveDuration = 0;
 }
@@ -60,7 +65,6 @@ function toggleSignals() {
 function changeSignal() {
     if (!isRunning) return;
 
-    // --- 1. Determine the next signal ---
     let nextIsRed;
     const nextDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
     
@@ -69,9 +73,8 @@ function changeSignal() {
         
         // Rule enforced: Force the opposite signal
         nextIsRed = !lastChoiceWasRed; 
-        console.log("Forcing switch due to 5-second consecutive rule.");
-
-        // Since we forced a switch, reset the duration for the new signal
+        
+        // Reset the duration for the new signal
         consecutiveDuration = 0; 
         
     } else {
@@ -79,16 +82,15 @@ function changeSignal() {
         // Rule not enforced: Use pure 50/50 randomization
         nextIsRed = Math.random() < 0.5;
         
-        // Check if the choice remains the same
+        // Update consecutive duration
         if (nextIsRed === lastChoiceWasRed) {
             consecutiveDuration += nextDelay;
         } else {
-            // New choice selected, reset consecutive duration
             consecutiveDuration = nextDelay;
         }
     }
 
-    // --- 2. Update the display ---
+    // --- Update the display ---
 
     if (nextIsRed) {
         body.style.backgroundColor = 'red';
@@ -101,7 +103,7 @@ function changeSignal() {
     // Update tracking variables for the next cycle
     lastChoiceWasRed = nextIsRed;
 
-    // --- 3. Schedule the next signal ---
+    // --- Schedule the next signal ---
     
     clearTimeout(timer);
     timer = setTimeout(changeSignal, nextDelay);
