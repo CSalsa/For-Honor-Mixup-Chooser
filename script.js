@@ -1,4 +1,4 @@
-[cite_start]
+/* script.js */
 const body = document.body;
 const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
@@ -14,7 +14,7 @@ let startTime = 0;
 let isRunning = false;
 
 // Text Constants
-const INSTRUCTION_MIXUP = 'MIX THEM UP!';
+const INSTRUCTION_MIXUP = 'DO A MIX-UP!';
 const INSTRUCTION_COMMIT = 'I COMMIT!';
 
 // Defined constraints (Variables for Floor/Ceiling controls)
@@ -259,4 +259,3 @@ if (floorDisplay && ceilingDisplay) {
 }
 
 startSignals();
-
