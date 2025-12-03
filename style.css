@@ -2,76 +2,64 @@ body {
     margin: 0;
     overflow: hidden;
     height: 100vh;
-    position: relative; 
-    
+    position: relative;
     display: flex;
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    background-color: transparent; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    font-family: Arial, sans-serif;
 }
 
 #signal-box {
-    position: absolute; 
+    position: absolute;
     top: 0;
     left: 0;
-    height: 100vh; 
+    height: 100vh;
     width: 100%;
-    background-color: black; 
-    
+    background-color: black;
     display: flex;
-    justify-content: center; 
-    align-items: center; 
-    transition: background-color 0.1s ease-in-out; 
-    z-index: 1; 
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.1s ease-in-out;
+    z-index: 1;
 }
 
 #instruction {
-    color: white; 
+    color: white;
     font-family: Arial, sans-serif;
-    font-size: 8em; 
-    font-weight: bold; 
+    /* Responsive font size: 15% of viewport width */
+    font-size: 15vw; 
+    font-weight: bold;
     text-align: center;
     user-select: none;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
-    z-index: 3; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+    margin: 0; /* Remove default margins */
 }
 
+/* --- Controls Container --- */
 #controls {
-    position: fixed; 
-    bottom: 0; 
+    position: fixed;
+    bottom: 0;
     left: 0;
-    width: 100%; 
-    z-index: 1000; 
-    padding: 15px 30px; 
+    width: 100%;
+    z-index: 1000;
+    padding: 15px 30px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); /* Fade background for readability */
     
     display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    box-sizing: border-box; 
-}
-
-/* --- Main Button Styling (Full Screen/Pause) --- */
-#main-buttons {
-    display: flex;
-    justify-content: center; 
-    flex-grow: 1; 
-}
-
-#main-buttons button {
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 1.5em;
-    cursor: pointer;
-    border: 3px solid white;
-    background-color: rgba(0, 0, 0, 0.4); 
-    color: white;
+    justify-content: space-between;
+    align-items: flex-end; /* Align to bottom */
+    box-sizing: border-box;
+    flex-wrap: wrap; /* ALLOW WRAPPING FOR MOBILE */
+    gap: 20px;
 }
 
 /* --- Config Panel Styling --- */
 #config {
     display: flex;
-    gap: 30px; 
+    gap: 30px;
 }
 
 .setting {
@@ -79,41 +67,110 @@ body {
     flex-direction: column;
     align-items: center;
     color: white;
-    font-family: Arial, sans-serif;
 }
 
 .setting label {
-    font-size: 1.2em;
+    font-size: 1rem;
     margin-bottom: 5px;
+    text-align: center;
 }
 
 .delay-display {
     font-family: monospace;
     font-size: 1.2em;
     margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.button-group {
+    display: flex;
+    gap: 5px;
 }
 
 /* Styling for the small +/- buttons */
 .setting button {
-    padding: 5px 15px; 
-    margin: 3px;
-    font-size: 1.5em;
+    padding: 5px;
+    font-size: 1.2em;
     cursor: pointer;
-    border: 3px solid white;
-    background-color: rgba(0, 0, 0, 0.4); 
+    border: 2px solid white;
+    background-color: rgba(0, 0, 0, 0.4);
     color: white;
-    width: 70px; 
+    width: 50px;
+    height: 50px; /* Make them touch-friendly squares */
     box-sizing: border-box;
+    border-radius: 5px;
 }
 
-/* --- Validation Output Styling (Single Line on Right) --- */
+/* --- Main Button Styling (Full Screen/Pause) --- */
+#main-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#main-buttons button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border: 3px solid white;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    border-radius: 5px;
+    min-height: 50px;
+}
+
+/* --- Stats Output Styling --- */
+#stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 80px;
+}
+
 #probability-display, #duration-timer {
-    position: static; 
-    margin-left: 10px; 
-    padding: 0;
-    font-size: 14px; 
-    color: white; 
-    font-family: monospace; 
-    z-index: 1001; 
+    font-size: 16px;
+    color: white;
+    font-family: monospace;
+    font-weight: bold;
+    z-index: 1001;
     visibility: hidden;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+    #controls {
+        justify-content: center; /* Center everything on mobile */
+        padding: 10px;
+        background: rgba(0,0,0,0.6); /* Darker background on mobile controls */
+    }
+
+    #config {
+        width: 100%;
+        justify-content: space-around; /* Spread floor/ceiling controls */
+        order: 1; /* Config goes first */
+    }
+
+    #main-buttons {
+        width: 100%;
+        justify-content: center;
+        order: 2; /* Buttons go second */
+    }
+    
+    #main-buttons button {
+        flex: 1; /* Buttons stretch to fill width */
+    }
+
+    #stats-container {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        pointer-events: none; /* Don't block clicks */
+        align-items: flex-end;
+        order: 3;
+    }
+    
+    /* Adjust text size for small screens */
+    #instruction {
+        font-size: 18vw; 
+    }
 }
