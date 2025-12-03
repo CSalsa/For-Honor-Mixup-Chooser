@@ -38,7 +38,7 @@ body {
     margin: 0; /* Remove default margins */
 }
 
-/* --- Controls Container --- */
+/*  Controls Container  */
 #controls {
     position: fixed;
     bottom: 0;
@@ -174,3 +174,4 @@ body {
         font-size: 18vw; 
     }
 }
+
