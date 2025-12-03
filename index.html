@@ -1,26 +1,33 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>For Honor Mixup Maker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
     <div id="signal-box">
         <h1 id="instruction">Loading...</h1>
     </div>
+
     <div id="controls">
         <div id="config">
             <div class="setting">
                 <label>Change Floor</label>
                 <div id="floor-display" class="delay-display">1.0</div>
-                <button id="floor-plus" onclick="changeDelay('floor', 500)">+</button>
-                <button id="floor-minus" onclick="changeDelay('floor', -500)">-</button>
+                <div class="button-group">
+                    <button id="floor-plus" onclick="changeDelay('floor', 500)">+</button>
+                    <button id="floor-minus" onclick="changeDelay('floor', -500)">-</button>
+                </div>
             </div>
             <div class="setting">
                 <label>Change Ceiling</label>
                 <div id="ceiling-display" class="delay-display">5.0</div>
-                <button id="ceiling-plus" onclick="changeDelay('ceiling', 500)">+</button>
-                <button id="ceiling-minus" onclick="changeDelay('ceiling', -500)">-</button>
+                <div class="button-group">
+                    <button id="ceiling-plus" onclick="changeDelay('ceiling', 500)">+</button>
+                    <button id="ceiling-minus" onclick="changeDelay('ceiling', -500)">-</button>
+                </div>
             </div>
         </div>
         
@@ -29,9 +36,12 @@
             <button id="start-stop-btn" onclick="toggleSignals()">Pause</button>
         </div>
         
-        <div id="probability-display">0%</div>
-        <div id="duration-timer">0.000</div>
+        <div id="stats-container">
+            <div id="probability-display">0%</div>
+            <div id="duration-timer">0.000</div>
+        </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
