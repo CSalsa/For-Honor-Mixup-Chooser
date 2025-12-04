@@ -1,7 +1,7 @@
 const body = document.body;
 const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
-const waitBtn = document.getElementById('wait-btn'); // NOTE: Make sure to add id="wait-btn" to HTML
+const waitBtn = document.getElementById('wait-btn'); 
 const signalBox = document.getElementById('signal-box'); 
 const durationTimerDisplay = document.getElementById('duration-timer');
 const probabilityDisplay = document.getElementById('probability-display'); 
@@ -53,11 +53,10 @@ function toggleWaitChoice() {
     } else {
         waitBtn.textContent = "Add Wait Choice";
         
-        // OPTIMIZATION: If we are currently "Waiting" but just removed that option...
-        // ... force an immediate switch to Commit or Mixup.
+        // If we currently have 'Wait' active but just disabled it, force a change immediately
         if (lastChoice === 2 && isRunning) {
-            clearTimeout(timer); // Cancel the pending schedule
-            changeSignal(true); // Force switch immediately
+            clearTimeout(timer); 
+            changeSignal(true); 
         }
     }
 }
@@ -82,11 +81,13 @@ function changeDelay(target, step) {
         ceilingDisplay.textContent = formatDelayControls(MAX_DELAY);
     }
     
+    // Update the mean for the next calculation
     MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2;
-    if (isRunning) {
-        stopSignals();
-        startSignals();
-    }
+    
+    // LOGIC UPDATE: We no longer stop/start signals here.
+    // The variables are updated globally. 
+    // If the new MAX_DELAY is lower than the current elapsed time, 
+    // updateCounter() will catch it on the next tick and force a switch automatically.
 }
 
 // --- Normal Distribution Function ---
@@ -160,6 +161,8 @@ function updateCounter() {
     const dynamicPercent = getLinearProbability(elapsed);
     probabilityDisplay.textContent = `${dynamicPercent}%`;
     
+    // This check runs constantly. If you lower the ceiling via changeDelay,
+    // this line will eventually evaluate to true and force the switch.
     if (elapsed >= MAX_DELAY) {
         clearTimeout(timer);
         changeSignal(true); // Force switch
@@ -231,8 +234,6 @@ function changeSignal(forceSwitch = false) {
     if (forceSwitch) {
         // Must be different from last
         const available = options.filter(opt => opt !== lastChoice);
-        // EDGE CASE: If we just removed Wait (2) and lastChoice was 2, 
-        // options are [0, 1]. 'available' is [0, 1]. It picks a valid new one.
         nextChoice = pick(available);
     } else {
         // Pure random
