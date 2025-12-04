@@ -1,4 +1,3 @@
-/* script.js */
 // State Variables
 let floor = 1.0; 
 let ceiling = 5.0; 
@@ -8,6 +7,7 @@ let isRunning = true; // Auto-start enabled
 let startTime = 0;
 let nextChangeDuration = 0;
 let animationFrameId = null;
+let currentOptionIndex = -1; // Track which option is active
 
 // DOM Elements
 const elDisplay = document.getElementById('main-display');
@@ -28,7 +28,6 @@ const options = [
 const formatTime = (val) => val.toFixed(1);
 
 // Helper: Box-Muller Transform (Bell Curve Generator)
-// Returns a random number with a standard normal distribution (mean=0, stdev=1)
 function randn_bm() {
     let u = 0, v = 0;
     while(u === 0) u = Math.random();
@@ -40,31 +39,27 @@ function randn_bm() {
 function getBellCurveDuration(min, max) {
     const mean = (min + max) / 2;
     const range = max - min;
-    // We assume the range (max - min) covers about 6 standard deviations (-3 to +3)
-    // This creates a bell curve centered between floor and ceiling.
     const stdDev = range / 6; 
     
     let num = randn_bm() * stdDev + mean;
 
     // Clamp values to ensure strictly within floor/ceiling
-    return Math.max(min, Math.min(max, num)) * 1000; // Return in ms
+    return Math.max(min, Math.min(max, num)) * 1000; 
 }
 
-// Logic: Calculate Visual Probability Percentage
-// Quadratic curve: 0% at <floor, 20% at floor, 30% at mid, 20% at ceiling
+// Logic: Visual Probability Percentage (0% -> 20% -> 30% -> 20%)
 function calculateProbability(elapsedMs, floorSec, ceilingSec) {
     const elapsedSec = elapsedMs / 1000;
 
     if (elapsedSec < floorSec) return 0; // 0% before floor
-    if (elapsedSec > ceilingSec) return 20; // Cap at 20% if we hit ceiling
+    if (elapsedSec >= ceilingSec) return 100; // 100% at ceiling
 
     // Normalize progress (0.0 to 1.0) between floor and ceiling
     const range = ceilingSec - floorSec;
-    if (range <= 0) return 20; // Edge case
+    if (range <= 0) return 20; 
     const progress = (elapsedSec - floorSec) / range;
 
-    // Quadratic Formula: y = -40(x - 0.5)^2 + 30
-    // At x=0 (floor), y=20. At x=0.5 (mid), y=30. At x=1 (ceiling), y=20.
+    // Quadratic Formula for the 20-30-20 curve
     const percent = -40 * Math.pow(progress - 0.5, 2) + 30;
     
     return Math.max(0, Math.round(percent));
@@ -76,20 +71,19 @@ function updateUI() {
     elCeilingVal.textContent = formatTime(ceiling);
 }
 
-// Main Loop (Runs every frame)
+// Main Loop
 function gameLoop(timestamp) {
     if (!isRunning) return;
 
-    // Check time
     const elapsed = timestamp - startTime;
     const elapsedSec = elapsed / 1000;
 
-    // Update Stats Display
+    // Update Stats
     elTimerVal.textContent = elapsedSec.toFixed(3);
     const prob = calculateProbability(elapsed, floor, ceiling);
     elProbVal.textContent = `${prob}%`;
 
-    // Trigger Change
+    // Trigger Change if duration exceeded
     if (elapsed >= nextChangeDuration) {
         triggerChange(timestamp);
     }
@@ -98,14 +92,25 @@ function gameLoop(timestamp) {
 }
 
 function triggerChange(timestamp) {
-    // 1. Pick Option
-    const choice = options[Math.floor(Math.random() * options.length)];
+    // FORCE TOGGLE:
+    // Instead of random(), we cycle to the next option.
+    // This guarantees the choice changes, solving the "wait too long" bug.
+    if (currentOptionIndex === -1) {
+        // First run: pick random
+        currentOptionIndex = Math.floor(Math.random() * options.length);
+    } else {
+        // Subsequent runs: swap to the other one
+        currentOptionIndex = (currentOptionIndex + 1) % options.length;
+    }
     
-    // 2. Update Visuals
+    const choice = options[currentOptionIndex];
+    
+    // Update Visuals
     elDisplay.style.backgroundColor = choice.color;
     elText.textContent = choice.text;
 
-    // 3. Reset Timing
+    // Reset Timing
+    // Because we forced a change, the stopwatch reset is always valid now.
     startTime = timestamp || performance.now();
     nextChangeDuration = getBellCurveDuration(floor, ceiling);
 }
@@ -124,9 +129,16 @@ function togglePlay() {
         // Start
         isRunning = true;
         btnPause.textContent = "Pause";
-        // Reset timer immediately
+        
+        // Reset state
         startTime = performance.now();
         nextChangeDuration = getBellCurveDuration(floor, ceiling);
+        
+        // Pick immediate random start if not set
+        if (currentOptionIndex === -1) {
+             triggerChange(startTime);
+        }
+        
         requestAnimationFrame(gameLoop);
     }
 }
