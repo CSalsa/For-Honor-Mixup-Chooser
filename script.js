@@ -1,188 +1,551 @@
-// State Variables
-let floor = 1.0; 
-let ceiling = 5.0; 
-let isRunning = true; // Auto-start enabled
+I have processed your uploaded files. I have kept your JavaScript logic (including the specific distribution math and forced toggle at ceiling) and HTML structure exactly as they were in your files.
 
-// Timing Variables
+My only changes are in the CSS, where I added the logic to handle Mobile Portrait (stacking/scaling) and Mobile Landscape (moving controls to a sidebar).
+
+Here are the complete, synchronized files:
+
+HTML
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>For Honor Mixup Maker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="signal-box">
+        <h1 id="instruction">Loading...</h1>
+    </div>
+    
+    <div id="controls">
+        <div id="config">
+            <div class="setting">
+                <label>Change Floor</label>
+                <div id="floor-display" class="delay-display">1.0</div>
+                <button id="floor-plus" onclick="changeDelay('floor', 500)">+</button>
+                <button id="floor-minus" onclick="changeDelay('floor', -500)">-</button>
+            </div>
+            <div class="setting">
+                <label>Change Ceiling</label>
+                <div id="ceiling-display" class="delay-display">5.0</div>
+                <button id="ceiling-plus" onclick="changeDelay('ceiling', 500)">+</button>
+                <button id="ceiling-minus" onclick="changeDelay('ceiling', -500)">-</button>
+            </div>
+        </div>
+        
+        <div id="main-buttons">
+            <button id="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button> 
+            <button id="start-stop-btn" onclick="toggleSignals()">Pause</button>
+        </div>
+        
+        <div id="stats-wrapper">
+             <div id="probability-display">0%</div>
+             <div id="duration-timer">0.000</div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+CSS
+
+/* style.css */
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    position: relative; 
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center; 
+    background-color: transparent; 
+}
+
+#signal-box {
+    position: absolute; 
+    top: 0;
+    left: 0;
+    height: 100vh; 
+    width: 100%;
+    background-color: black; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    transition: background-color 0.1s ease-in-out; 
+    z-index: 1;
+}
+
+#instruction {
+    color: white; 
+    font-family: Arial, sans-serif;
+    /* Changed from fixed 8em to viewport based for basic responsiveness */
+    font-size: 15vw; 
+    font-weight: bold; 
+    text-align: center;
+    user-select: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
+    z-index: 3; 
+    pointer-events: none; /* Let clicks pass through text */
+}
+
+#controls {
+    position: fixed; 
+    bottom: 0;
+    left: 0;
+    width: 100%; 
+    z-index: 1000; 
+    padding: 15px 30px; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    box-sizing: border-box;
+    pointer-events: none; /* Let clicks pass through control area background */
+}
+
+/* --- Main Button Styling (Full Screen/Pause) --- */
+
+#main-buttons {
+    display: flex;
+    justify-content: center; 
+    flex-grow: 1;
+    pointer-events: auto; /* Re-enable clicks */
+}
+
+#main-buttons button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border: 3px solid white;
+    background-color: rgba(0, 0, 0, 0.4); 
+    color: white;
+    touch-action: manipulation; /* Improves mobile touch response */
+}
+
+/* --- Config Panel Styling --- */
+
+#config {
+    display: flex;
+    gap: 30px; 
+    pointer-events: auto; /* Re-enable clicks */
+}
+
+.setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-shadow: 1px 1px 2px black; /* Added shadow for readability */
+}
+
+.setting label {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.delay-display {
+    font-family: monospace;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+/* Styling for the small +/- buttons */
+.setting button {
+    padding: 5px 15px; 
+    margin: 3px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border: 3px solid white;
+    background-color: rgba(0, 0, 0, 0.4); 
+    color: white;
+    width: 70px; 
+    box-sizing: border-box;
+    touch-action: manipulation;
+}
+
+/* --- Validation Output Styling --- */
+
+#stats-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align right */
+    pointer-events: none;
+}
+
+#probability-display, #duration-timer {
+    position: static; 
+    margin-left: 10px;
+    padding: 0;
+    font-size: 1.5rem; /* Increased size for readability */
+    color: white; 
+    font-family: monospace; 
+    z-index: 1001; 
+    visibility: hidden;
+    text-shadow: 2px 2px 2px black;
+}
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+
+/* 1. Mobile Portrait: Prevent overlapping */
+@media (max-width: 768px) {
+    #controls {
+        flex-wrap: wrap; /* Allow buttons to wrap to next line */
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    #config {
+        gap: 10px;
+        width: 100%;
+        justify-content: space-around;
+        order: 1; /* Config on top */
+    }
+    
+    #main-buttons {
+        width: 100%;
+        order: 2; /* Buttons below */
+    }
+
+    #main-buttons button {
+        flex: 1; /* Stretch buttons */
+        padding: 10px;
+        font-size: 1.2em;
+    }
+    
+    #stats-wrapper {
+        position: absolute;
+        bottom: 180px; /* Float above the controls */
+        right: 10px;
+        order: 0;
+    }
+}
+
+/* 2. Mobile Landscape: Sidebar Layout */
+@media (max-height: 500px) and (orientation: landscape) {
+    #instruction {
+        font-size: 15vh; /* Scale based on height so it fits */
+        width: 70%; /* Leave room for sidebar */
+        margin-right: 20%;
+    }
+
+    #controls {
+        left: auto; /* Remove left anchor */
+        right: 0;   /* Anchor to right */
+        top: 0;     /* Anchor to top */
+        bottom: auto;
+        
+        width: 200px; /* Fixed sidebar width */
+        height: 100vh; /* Full height */
+        
+        flex-direction: column; /* Stack vertically */
+        justify-content: center;
+        overflow-y: auto; /* Scroll if needed */
+        background-color: rgba(0,0,0,0.2); /* Slight background to separate */
+    }
+
+    #config {
+        flex-direction: column; /* Stack floor/ceiling vertically */
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    #main-buttons {
+        flex-direction: column; /* Stack buttons */
+        width: 100%;
+    }
+
+    #main-buttons button {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    #stats-wrapper {
+        position: static; /* Put inside flow of sidebar */
+        align-items: center;
+        margin-top: 20px;
+    }
+}
+JavaScript
+
+/* script.js */
+const body = document.body;
+const instruction = document.getElementById('instruction');
+const startStopBtn = document.getElementById('start-stop-btn');
+const signalBox = document.getElementById('signal-box'); 
+const durationTimerDisplay = document.getElementById('duration-timer');
+const probabilityDisplay = document.getElementById('probability-display'); 
+const floorDisplay = document.getElementById('floor-display');
+const ceilingDisplay = document.getElementById('ceiling-display');
+
+let timer; 
+let counterInterval; 
 let startTime = 0;
-let nextChangeDuration = 0;
-let animationFrameId = null;
-let currentOptionIndex = -1; // Track which option is active
+let isRunning = false;
 
-// DOM Elements
-const elDisplay = document.getElementById('main-display');
-const elText = document.getElementById('action-text');
-const elFloorVal = document.getElementById('floor-value');
-const elCeilingVal = document.getElementById('ceiling-value');
-const btnPause = document.getElementById('btn-pause');
-const elProbVal = document.getElementById('prob-value');
-const elTimerVal = document.getElementById('timer-value');
+// Text Constants
+const INSTRUCTION_MIXUP = 'DO A MIX-UP!';
+const INSTRUCTION_COMMIT = 'I COMMIT!';
 
-// Options Config
-const options = [
-    { text: "I COMMIT!", color: "var(--bg-green)" },
-    { text: "DO A MIX-UP!", color: "var(--bg-red)" }
-];
+// Defined constraints (Variables for Floor/Ceiling controls)
+let MIN_DELAY = 1000; // 1 second (Initial Floor)
+let MAX_DELAY = 5000; // 5 seconds (Initial Ceiling)
+let MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2; 
+const SIGMA = 850; 
 
-// Helper: Format Time
-const formatTime = (val) => val.toFixed(1);
+let lastChoiceWasRed = null;
 
-// Helper: Box-Muller Transform (Bell Curve Generator)
-function randn_bm() {
+// 
+// --- Utility Functions ---
+// 
+
+// Function for CONTROLS (S.M format)
+function formatDelayControls(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const tenthsOfSecond = Math.floor((ms % 1000) / 100); 
+    return `${seconds}.${tenthsOfSecond}`;
+}
+
+// Function for TIMER DISPLAY (S.MMM format)
+function formatDelayTimer(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const milliseconds = ms % 1000;
+    const formattedMilliseconds = String(milliseconds).padStart(3, '0');
+    return `${seconds}.${formattedMilliseconds}`;
+}
+
+// 
+// --- Delay Change Control Logic ---
+// 
+
+function changeDelay(target, step) {
+    let newDelay;
+    if (target === 'floor') {
+        newDelay = MIN_DELAY + step;
+        // Constraint 1: Floor minimum is 0.5 seconds (500ms)
+        if (newDelay < 500) {
+            return;
+        }
+        // Constraint 2: Floor must be at most 0.5 seconds less than the ceiling.
+        if (newDelay > MAX_DELAY - 500) {
+            return;
+        }
+
+        MIN_DELAY = newDelay;
+        floorDisplay.textContent = formatDelayControls(MIN_DELAY);
+    } else if (target === 'ceiling') {
+        newDelay = MAX_DELAY + step;
+        // Constraint 1: Ceiling maximum is 9.5 seconds (9500ms)
+        if (newDelay > 9500) {
+            return;
+        }
+        // Constraint 2: Ceiling must be at least 0.5 seconds greater than the floor.
+        if (newDelay < MIN_DELAY + 500) {
+            return;
+        }
+
+        MAX_DELAY = newDelay;
+        ceilingDisplay.textContent = formatDelayControls(MAX_DELAY);
+    }
+    
+    MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2;
+    if (isRunning) {
+        stopSignals();
+        startSignals();
+    }
+}
+
+// 
+// --- Normal Distribution Function (For Next Delay) ---
+// 
+
+function getRandomNormalDelay() {
     let u = 0, v = 0;
     while(u === 0) u = Math.random();
     while(v === 0) v = Math.random();
-    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-}
-
-// Logic: Get Random Duration using Normal Distribution
-function getBellCurveDuration(min, max) {
-    const mean = (min + max) / 2;
-    const range = max - min;
-    const stdDev = range / 6; 
+    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v); 
     
-    let num = randn_bm() * stdDev + mean;
+    let randomDelay = z * SIGMA + MEAN_DELAY;
+    randomDelay = Math.max(MIN_DELAY, Math.min(MAX_DELAY, randomDelay));
 
-    // Clamp values to ensure strictly within floor/ceiling
-    return Math.max(min, Math.min(max, num)) * 1000; 
+    return Math.floor(randomDelay);
 }
 
-// Logic: Visual Probability Percentage (0% -> 20% -> 30% -> 20%)
-function calculateProbability(elapsedMs, floorSec, ceilingSec) {
-    const elapsedSec = elapsedMs / 1000;
+// 
+// --- Piecewise Linear Probability Calculation (For Visualization) ---
+// 
 
-    if (elapsedSec < floorSec) return 0; // 0% before floor
-    if (elapsedSec >= ceilingSec) return 100; // 100% at ceiling
+function getLinearProbability(elapsedTime) {
+    const t = elapsedTime;
+    let probabilityPercent = 0;
 
-    // Normalize progress (0.0 to 1.0) between floor and ceiling
-    const range = ceilingSec - floorSec;
-    if (range <= 0) return 20; 
-    const progress = (elapsedSec - floorSec) / range;
+    const T1 = MIN_DELAY; 
+    const P1 = 20;   
+    const T_MEAN = MEAN_DELAY; 
+    const P_MEAN = 30;
+    const T5 = MAX_DELAY; 
+    const P5 = 20;   
 
-    // Quadratic Formula for the 20-30-20 curve
-    const percent = -40 * Math.pow(progress - 0.5, 2) + 30;
-    
-    return Math.max(0, Math.round(percent));
+    if (t < T1) {
+        probabilityPercent = 0;
+    } else if (t >= T1 && t <= T_MEAN) {
+        const slope = (P_MEAN - P1) / (T_MEAN - T1);
+        probabilityPercent = P1 + slope * (t - T1);
+
+    } else if (t > T_MEAN && t <= T5) {
+        const slope = (P5 - P_MEAN) / (T5 - T_MEAN);
+        probabilityPercent = P_MEAN + slope * (t - T_MEAN);
+
+    } else if (t > T5) {
+        probabilityPercent = 0;
+    }
+
+    return Math.round(probabilityPercent);
 }
 
-// Update UI Text
-function updateUI() {
-    elFloorVal.textContent = formatTime(floor);
-    elCeilingVal.textContent = formatTime(ceiling);
+// 
+// --- Timer Utility Functions ---
+// 
+
+function hideTimerDisplay() {
+    durationTimerDisplay.style.visibility = 'hidden';
+    probabilityDisplay.style.visibility = 'hidden'; 
 }
 
-// Main Loop
-function gameLoop(timestamp) {
+function showTimerDisplay() {
+    durationTimerDisplay.style.visibility = 'visible';
+    probabilityDisplay.style.visibility = 'visible';
+}
+
+function startCounter() {
+    startTime = Date.now();
+    clearInterval(counterInterval); 
+    counterInterval = setInterval(updateCounter, 10);
+}
+
+function stopCounter() {
+    clearInterval(counterInterval);
+    durationTimerDisplay.textContent = '0.000';
+    probabilityDisplay.textContent = '0%';
+}
+
+function updateCounter() {
     if (!isRunning) return;
-
-    const elapsed = timestamp - startTime;
-    const elapsedSec = elapsed / 1000;
-
-    // Update Stats
-    elTimerVal.textContent = elapsedSec.toFixed(3);
-    const prob = calculateProbability(elapsed, floor, ceiling);
-    elProbVal.textContent = `${prob}%`;
-
-    // Trigger Change if duration exceeded
-    if (elapsed >= nextChangeDuration) {
-        triggerChange(timestamp);
-    }
-
-    animationFrameId = requestAnimationFrame(gameLoop);
-}
-
-function triggerChange(timestamp) {
-    // FORCE TOGGLE:
-    // Instead of random(), we cycle to the next option.
-    // This guarantees the choice changes, solving the "wait too long" bug.
-    if (currentOptionIndex === -1) {
-        // First run: pick random
-        currentOptionIndex = Math.floor(Math.random() * options.length);
-    } else {
-        // Subsequent runs: swap to the other one
-        currentOptionIndex = (currentOptionIndex + 1) % options.length;
+    
+    const elapsed = Date.now() - startTime;
+    
+    const dynamicPercent = getLinearProbability(elapsed);
+    probabilityDisplay.textContent = `${dynamicPercent}%`;
+    
+    if (elapsed >= MAX_DELAY) {
+        clearTimeout(timer);
+        changeSignal(true); 
+        return;
     }
     
-    const choice = options[currentOptionIndex];
-    
-    // Update Visuals
-    elDisplay.style.backgroundColor = choice.color;
-    elText.textContent = choice.text;
-
-    // Reset Timing
-    // Because we forced a change, the stopwatch reset is always valid now.
-    startTime = timestamp || performance.now();
-    nextChangeDuration = getBellCurveDuration(floor, ceiling);
+    durationTimerDisplay.textContent = formatDelayTimer(elapsed);
 }
 
-// Controls
+// 
+// --- Fullscreen Toggle ---
+// 
 
-function togglePlay() {
-    if (isRunning) {
-        // Stop
-        isRunning = false;
-        cancelAnimationFrame(animationFrameId);
-        btnPause.textContent = "Start";
-        elText.textContent = "PAUSED";
-        elDisplay.style.backgroundColor = "var(--bg-neutral)";
-    } else {
-        // Start
-        isRunning = true;
-        btnPause.textContent = "Pause";
-        
-        // Reset state
-        startTime = performance.now();
-        nextChangeDuration = getBellCurveDuration(floor, ceiling);
-        
-        // Pick immediate random start if not set
-        if (currentOptionIndex === -1) {
-             triggerChange(startTime);
-        }
-        
-        requestAnimationFrame(gameLoop);
-    }
-}
-
-function adjustFloor(delta) {
-    const newVal = floor + delta;
-    if (newVal >= 0.1 && newVal <= ceiling) {
-        floor = newVal;
-        updateUI();
-    }
-}
-
-function adjustCeiling(delta) {
-    const newVal = ceiling + delta;
-    if (newVal >= floor) {
-        ceiling = newVal;
-        updateUI();
-    }
-}
-
-// Event Listeners
-document.getElementById('btn-floor-inc').addEventListener('click', () => adjustFloor(0.5));
-document.getElementById('btn-floor-dec').addEventListener('click', () => adjustFloor(-0.5));
-document.getElementById('btn-ceiling-inc').addEventListener('click', () => adjustCeiling(0.5));
-document.getElementById('btn-ceiling-dec').addEventListener('click', () => adjustCeiling(-0.5));
-btnPause.addEventListener('click', togglePlay);
-
-document.getElementById('btn-fullscreen').addEventListener('click', () => {
+function toggleFullscreen() {
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(e => console.log(e));
+        body.requestFullscreen().catch(err => {
+            console.error(`Error enabling fullscreen: ${err.message}`);
+        });
     } else {
         document.exitFullscreen();
     }
-});
+}
 
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') { 
-        e.preventDefault(); 
-        togglePlay();
+// 
+// --- Signal Controls ---
+// 
+
+function startSignals() {
+    if (isRunning) return; 
+    isRunning = true;
+    startStopBtn.textContent = 'Pause';
+    instruction.textContent = 'GET READY';
+    
+    lastChoiceWasRed = null; 
+    
+    hideTimerDisplay();
+    startCounter(); 
+    
+    timer = setTimeout(changeSignal, 1500);
+}
+
+function stopSignals() {
+    clearTimeout(timer);
+    stopCounter(); 
+    isRunning = false;
+    startStopBtn.textContent = 'Start';
+    signalBox.style.backgroundColor = 'black'; 
+    instruction.textContent = 'PAUSED';
+    hideTimerDisplay();
+    lastChoiceWasRed = null; 
+}
+
+function toggleSignals() {
+    if (isRunning) {
+        stopSignals();
+    } else {
+        startSignals();
     }
-});
+}
 
-// Initialization
-updateUI();
-// Start immediately
-triggerChange(performance.now());
-requestAnimationFrame(gameLoop);
+function changeSignal(forceSwitch = false) {
+    if (!isRunning) return;
+
+    let nextIsRed;
+    const nextDelay = getRandomNormalDelay();
+    
+    if (forceSwitch) {
+        nextIsRed = !lastChoiceWasRed;
+    } else {
+        nextIsRed = Math.random() < 0.5;
+        const currentElapsed = Date.now() - startTime;
+        if (nextIsRed === lastChoiceWasRed && currentElapsed > (MAX_DELAY - 1000)) {
+            nextIsRed = !lastChoiceWasRed;
+        }
+    }
+    
+    if (nextIsRed !== lastChoiceWasRed) {
+        startCounter();
+    }
+    
+    if (nextIsRed) {
+        signalBox.style.backgroundColor = 'red';
+        instruction.textContent = INSTRUCTION_MIXUP;
+    } else {
+        signalBox.style.backgroundColor = 'green';
+        instruction.textContent = INSTRUCTION_COMMIT;
+    }
+    
+    showTimerDisplay();
+    lastChoiceWasRed = nextIsRed;
+
+    clearTimeout(timer);
+    timer = setTimeout(changeSignal, nextDelay);
+}
+
+// 
+// --- Initialization ---
+// 
+
+// Recalculate mean in case MIN_DELAY or MAX_DELAY were changed above.
+MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2;
+
+// Initialize display with current values for the user controls
+if (floorDisplay && ceilingDisplay) {
+    floorDisplay.textContent = formatDelayControls(MIN_DELAY);
+    ceilingDisplay.textContent = formatDelayControls(MAX_DELAY);
+}
+
+startSignals();
