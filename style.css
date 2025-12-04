@@ -27,14 +27,14 @@ body {
 #instruction {
     color: white; 
     font-family: Arial, sans-serif;
-    /* DYNAMIC SIZING: Uses viewport width instead of fixed sizing */
+    /* DYNAMIC SIZING */
     font-size: 15vw; 
     font-weight: bold; 
     text-align: center;
     user-select: none;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
     z-index: 3; 
-    pointer-events: none; /* Allows clicks to pass through text */
+    pointer-events: none; 
 }
 
 #controls {
@@ -47,14 +47,11 @@ body {
     
     display: flex;
     justify-content: space-between; 
-    align-items: flex-end; /* Aligns buttons to the bottom */
+    align-items: flex-end; 
     box-sizing: border-box;
-    
-    /* Critical: Allows clicking the color area "through" the empty parts of the control bar */
     pointer-events: none; 
 }
 
-/* Re-enable pointer events for the actual buttons */
 #config, #main-buttons {
     pointer-events: auto;
 }
@@ -63,6 +60,9 @@ body {
 #main-buttons {
     display: flex;
     gap: 10px;
+    /* Allows buttons to stack if screen is too narrow */
+    flex-wrap: wrap; 
+    justify-content: flex-end;
 }
 
 #main-buttons button {
@@ -73,6 +73,7 @@ body {
     background-color: rgba(0, 0, 0, 0.4); 
     color: white;
     font-weight: bold;
+    touch-action: manipulation;
 }
 
 /* --- Config Panel Styling --- */
@@ -110,15 +111,15 @@ body {
     border: 2px solid white;
     background-color: rgba(0, 0, 0, 0.4); 
     color: white;
-    width: 60px; /* Wider for thumbs */
-    height: 50px; /* Taller for thumbs */
+    width: 60px; 
+    height: 50px; 
     box-sizing: border-box;
 }
 
 /* --- Stats Styling --- */
 #stats-container {
     position: absolute;
-    bottom: 80px; /* Sits above the buttons on desktop */
+    bottom: 80px; 
     right: 20px;
     display: flex;
     flex-direction: column;
@@ -127,17 +128,17 @@ body {
 }
 
 #probability-display, #duration-timer {
-    font-size: 12px; /* Small as requested */
+    font-size: 12px; 
     color: rgba(255, 255, 255, 0.8); 
     font-family: monospace; 
-    visibility: hidden; /* JS toggles this */
+    visibility: hidden; 
     text-shadow: 1px 1px 1px black;
 }
 
 /* --- MOBILE LANDSCAPE SPECIFIC --- */
 @media (max-height: 500px) and (orientation: landscape) {
     #instruction {
-        font-size: 10vh; /* Shrink text height so it doesn't clip */
+        font-size: 10vh; 
     }
 
     #controls {
@@ -145,19 +146,19 @@ body {
         align-items: flex-end;
     }
     
-    /* Split Layout: Config on Left, Buttons on Right */
     #config {
-        order: 1; /* Left */
+        order: 1; 
     }
     
     #main-buttons {
-        order: 2; /* Right */
+        order: 2; 
+        max-width: 250px; /* Force wrapping on side if needed */
     }
 
-    /* Shrink buttons slightly to fit short screens */
     #main-buttons button {
         padding: 8px 15px;
         font-size: 1em;
+        margin-bottom: 5px;
     }
     
     .setting button {
@@ -170,10 +171,9 @@ body {
         font-size: 0.8rem;
     }
     
-    /* Stats tucked into corner */
     #stats-container {
         bottom: 5px;
-        right: 50%; /* Center them or tuck them away */
+        right: 50%; 
         transform: translateX(50%);
         flex-direction: row;
         gap: 10px;
@@ -183,22 +183,25 @@ body {
 /* --- MOBILE PORTRAIT SPECIFIC --- */
 @media (max-width: 600px) and (orientation: portrait) {
     #controls {
-        flex-direction: column-reverse; /* Buttons on bottom, Config above them */
+        flex-direction: column-reverse; 
         align-items: center;
         gap: 15px;
     }
     
     #main-buttons {
         width: 100%;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 5px;
     }
     
     #main-buttons button {
-        flex: 1;
+        flex: 1 1 30%; /* Allow buttons to share row but wrap if needed */
+        font-size: 1em;
+        padding: 10px;
     }
     
     #stats-container {
-        bottom: 5px; /* Very bottom corner */
+        bottom: 5px; 
         right: 5px;
         z-index: 2000;
     }
