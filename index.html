@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>For Honor Mixup Maker</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Honor Mixup Chooser</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <div id="signal-box">
-        <h1 id="instruction">Loading...</h1>
-    </div>
 
-    <div id="controls">
-        <div id="config">
-            <div class="setting">
-                <label>Change Floor</label>
-                <div id="floor-display" class="delay-display">1.0</div>
-                <div class="button-group">
-                    <button id="floor-plus" onclick="changeDelay('floor', 500)">+</button>
-                    <button id="floor-minus" onclick="changeDelay('floor', -500)">-</button>
-                </div>
+    <main id="main-display" class="display-area">
+        <h1 id="action-text">PRESS START</h1>
+    </main>
+
+    <footer class="controls">
+        
+        <div class="control-group">
+            <div class="label-row">
+                <span>Floor</span>
+                <span id="floor-value">1.0</span>
             </div>
-            <div class="setting">
-                <label>Change Ceiling</label>
-                <div id="ceiling-display" class="delay-display">5.0</div>
-                <div class="button-group">
-                    <button id="ceiling-plus" onclick="changeDelay('ceiling', 500)">+</button>
-                    <button id="ceiling-minus" onclick="changeDelay('ceiling', -500)">-</button>
-                </div>
+            <div class="button-row">
+                <button id="btn-floor-inc" aria-label="Increase Floor">+</button>
+                <button id="btn-floor-dec" aria-label="Decrease Floor">-</button>
             </div>
         </div>
-        
-        <div id="main-buttons">
-            <button id="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button> 
-            <button id="start-stop-btn" onclick="toggleSignals()">Pause</button>
+
+        <div class="control-group">
+            <div class="label-row">
+                <span>Ceiling</span>
+                <span id="ceiling-value">5.0</span>
+            </div>
+            <div class="button-row">
+                <button id="btn-ceiling-inc" aria-label="Increase Ceiling">+</button>
+                <button id="btn-ceiling-dec" aria-label="Decrease Ceiling">-</button>
+            </div>
         </div>
-        
-        <div id="stats-container">
-            <div id="probability-display">0%</div>
-            <div id="duration-timer">0.000</div>
+
+        <div class="control-group actions">
+            <button id="btn-fullscreen">Full Screen</button>
+            <button id="btn-pause">Start</button>
         </div>
-    </div>
+
+    </footer>
 
     <script src="script.js"></script>
 </body>
