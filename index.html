@@ -12,12 +12,16 @@
         <h1 id="action-text">PRESS START</h1>
     </main>
 
+    <div class="stats-container">
+        <span id="prob-value">0%</span>
+        <span id="timer-value">0.000</span>
+    </div>
+
     <footer class="controls">
         
         <div class="control-group">
             <div class="label-row">
-                <span>Floor</span>
-                <span id="floor-value">1.0</span>
+                <span>Change Floor</span> <span id="floor-value">1.0</span>
             </div>
             <div class="button-row">
                 <button id="btn-floor-inc" aria-label="Increase Floor">+</button>
@@ -27,8 +31,7 @@
 
         <div class="control-group">
             <div class="label-row">
-                <span>Ceiling</span>
-                <span id="ceiling-value">5.0</span>
+                <span>Change Ceiling</span> <span id="ceiling-value">5.0</span>
             </div>
             <div class="button-row">
                 <button id="btn-ceiling-inc" aria-label="Increase Ceiling">+</button>
@@ -38,7 +41,7 @@
 
         <div class="control-group actions">
             <button id="btn-fullscreen">Full Screen</button>
-            <button id="btn-pause">Start</button>
+            <button id="btn-pause">Pause</button>
         </div>
 
     </footer>
