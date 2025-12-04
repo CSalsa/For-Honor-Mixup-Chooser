@@ -1,4 +1,3 @@
-/* style.css */
 body {
     margin: 0;
     overflow: hidden;
@@ -28,14 +27,14 @@ body {
 #instruction {
     color: white; 
     font-family: Arial, sans-serif;
-    /* Changed from fixed 8em to viewport based for basic responsiveness */
+    /* DYNAMIC SIZING: Uses viewport width instead of fixed sizing */
     font-size: 15vw; 
     font-weight: bold; 
     text-align: center;
     user-select: none;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
     z-index: 3; 
-    pointer-events: none; /* Let clicks pass through text */
+    pointer-events: none; /* Allows clicks to pass through text */
 }
 
 #controls {
@@ -44,40 +43,42 @@ body {
     left: 0;
     width: 100%; 
     z-index: 1000; 
-    padding: 15px 30px; 
+    padding: 15px; 
+    
     display: flex;
     justify-content: space-between; 
-    align-items: center;
+    align-items: flex-end; /* Aligns buttons to the bottom */
     box-sizing: border-box;
-    pointer-events: none; /* Let clicks pass through control area background */
+    
+    /* Critical: Allows clicking the color area "through" the empty parts of the control bar */
+    pointer-events: none; 
 }
 
-/* --- Main Button Styling (Full Screen/Pause) --- */
+/* Re-enable pointer events for the actual buttons */
+#config, #main-buttons {
+    pointer-events: auto;
+}
 
+/* --- Main Button Styling --- */
 #main-buttons {
     display: flex;
-    justify-content: center; 
-    flex-grow: 1;
-    pointer-events: auto; /* Re-enable clicks */
+    gap: 10px;
 }
 
 #main-buttons button {
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 1.5em;
+    padding: 15px 20px;
+    font-size: 1.2em;
     cursor: pointer;
     border: 3px solid white;
     background-color: rgba(0, 0, 0, 0.4); 
     color: white;
-    touch-action: manipulation; /* Improves mobile touch response */
+    font-weight: bold;
 }
 
 /* --- Config Panel Styling --- */
-
 #config {
     display: flex;
-    gap: 30px; 
-    pointer-events: auto; /* Re-enable clicks */
+    gap: 20px; 
 }
 
 .setting {
@@ -86,11 +87,11 @@ body {
     align-items: center;
     color: white;
     font-family: Arial, sans-serif;
-    text-shadow: 1px 1px 2px black; /* Added shadow for readability */
+    text-shadow: 1px 1px 2px black;
 }
 
 .setting label {
-    font-size: 1.2em;
+    font-size: 1rem;
     margin-bottom: 5px;
 }
 
@@ -102,118 +103,103 @@ body {
 
 /* Styling for the small +/- buttons */
 .setting button {
-    padding: 5px 15px; 
-    margin: 3px;
+    padding: 10px; 
+    margin: 2px;
     font-size: 1.5em;
     cursor: pointer;
-    border: 3px solid white;
+    border: 2px solid white;
     background-color: rgba(0, 0, 0, 0.4); 
     color: white;
-    width: 70px; 
+    width: 60px; /* Wider for thumbs */
+    height: 50px; /* Taller for thumbs */
     box-sizing: border-box;
-    touch-action: manipulation;
 }
 
-/* --- Validation Output Styling --- */
-
-#stats-wrapper {
+/* --- Stats Styling --- */
+#stats-container {
+    position: absolute;
+    bottom: 80px; /* Sits above the buttons on desktop */
+    right: 20px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Align right */
+    align-items: flex-end;
     pointer-events: none;
 }
 
 #probability-display, #duration-timer {
-    position: static; 
-    margin-left: 10px;
-    padding: 0;
-    font-size: 1.5rem; /* Increased size for readability */
-    color: white; 
+    font-size: 12px; /* Small as requested */
+    color: rgba(255, 255, 255, 0.8); 
     font-family: monospace; 
-    z-index: 1001; 
-    visibility: hidden;
-    text-shadow: 2px 2px 2px black;
+    visibility: hidden; /* JS toggles this */
+    text-shadow: 1px 1px 1px black;
 }
 
-/* --- RESPONSIVE MEDIA QUERIES --- */
-
-/* 1. Mobile Portrait: Prevent overlapping */
-@media (max-width: 768px) {
-    #controls {
-        flex-wrap: wrap; /* Allow buttons to wrap to next line */
-        justify-content: center;
-        gap: 10px;
-        padding: 10px;
+/* --- MOBILE LANDSCAPE SPECIFIC --- */
+@media (max-height: 500px) and (orientation: landscape) {
+    #instruction {
+        font-size: 10vh; /* Shrink text height so it doesn't clip */
     }
 
+    #controls {
+        padding: 10px;
+        align-items: flex-end;
+    }
+    
+    /* Split Layout: Config on Left, Buttons on Right */
     #config {
-        gap: 10px;
-        width: 100%;
-        justify-content: space-around;
-        order: 1; /* Config on top */
+        order: 1; /* Left */
     }
     
     #main-buttons {
-        width: 100%;
-        order: 2; /* Buttons below */
+        order: 2; /* Right */
     }
 
+    /* Shrink buttons slightly to fit short screens */
     #main-buttons button {
-        flex: 1; /* Stretch buttons */
-        padding: 10px;
+        padding: 8px 15px;
+        font-size: 1em;
+    }
+    
+    .setting button {
+        width: 50px;
+        height: 40px;
         font-size: 1.2em;
     }
     
-    #stats-wrapper {
-        position: absolute;
-        bottom: 180px; /* Float above the controls */
-        right: 10px;
-        order: 0;
+    .setting label {
+        font-size: 0.8rem;
+    }
+    
+    /* Stats tucked into corner */
+    #stats-container {
+        bottom: 5px;
+        right: 50%; /* Center them or tuck them away */
+        transform: translateX(50%);
+        flex-direction: row;
+        gap: 10px;
     }
 }
 
-/* 2. Mobile Landscape: Sidebar Layout */
-@media (max-height: 500px) and (orientation: landscape) {
-    #instruction {
-        font-size: 15vh; /* Scale based on height so it fits */
-        width: 70%; /* Leave room for sidebar */
-        margin-right: 20%;
-    }
-
+/* --- MOBILE PORTRAIT SPECIFIC --- */
+@media (max-width: 600px) and (orientation: portrait) {
     #controls {
-        left: auto; /* Remove left anchor */
-        right: 0;   /* Anchor to right */
-        top: 0;     /* Anchor to top */
-        bottom: auto;
-        
-        width: 200px; /* Fixed sidebar width */
-        height: 100vh; /* Full height */
-        
-        flex-direction: column; /* Stack vertically */
-        justify-content: center;
-        overflow-y: auto; /* Scroll if needed */
-        background-color: rgba(0,0,0,0.2); /* Slight background to separate */
-    }
-
-    #config {
-        flex-direction: column; /* Stack floor/ceiling vertically */
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    #main-buttons {
-        flex-direction: column; /* Stack buttons */
-        width: 100%;
-    }
-
-    #main-buttons button {
-        width: 100%;
-        margin: 5px 0;
+        flex-direction: column-reverse; /* Buttons on bottom, Config above them */
+        align-items: center;
+        gap: 15px;
     }
     
-    #stats-wrapper {
-        position: static; /* Put inside flow of sidebar */
-        align-items: center;
-        margin-top: 20px;
+    #main-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    #main-buttons button {
+        flex: 1;
+    }
+    
+    #stats-container {
+        bottom: 5px; /* Very bottom corner */
+        right: 5px;
+        z-index: 2000;
     }
 }
