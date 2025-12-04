@@ -1,177 +1,197 @@
-/* style.css */
-body {
+:root {
+    /* Using slightly brighter standard colors for maximum impact */
+    --bg-green: #00cc00; 
+    --bg-red: #ff0000;
+    --bg-neutral: #333333;
+    --text-white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    touch-action: manipulation;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
     overflow: hidden;
-    height: 100vh;
-    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: transparent;
-    font-family: Arial, sans-serif;
+    background-color: var(--bg-neutral);
 }
 
-#signal-box {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100%;
-    background-color: black;
+/* --- Main Display Area --- */
+
+.display-area {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.1s ease-in-out;
-    z-index: 1;
+    /* The color is set by JS on the element style */
+    transition: background-color 0.2s ease;
+    width: 100%;
 }
 
-#instruction {
-    color: white;
-    font-family: Arial, sans-serif;
-    /* Responsive font size: 15% of viewport width */
-    font-size: 15vw; 
-    font-weight: bold;
+#action-text {
+    font-size: 15vw;
+    font-weight: 900;
+    color: var(--text-white);
+    text-transform: uppercase;
     text-align: center;
+    /* Strong shadow for readability on bright colors */
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+    pointer-events: none;
     user-select: none;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    z-index: 3;
-    margin: 0; /* Remove default margins */
 }
 
-/* --- Controls Container --- */
-#controls {
-    position: fixed;
+/* --- Controls Footer (Default Desktop) --- */
+
+.controls {
+    position: absolute;
     bottom: 0;
-    left: 0;
     width: 100%;
-    z-index: 1000;
-    padding: 15px 30px;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); /* Fade background for readability */
-    
+    padding: 1rem;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end; /* Align to bottom */
-    box-sizing: border-box;
-    flex-wrap: wrap; /* ALLOW WRAPPING FOR MOBILE */
-    gap: 20px;
+    justify-content: center;
+    gap: 2rem;
+    pointer-events: none;
+    z-index: 10;
+    /* No background color here anymore */
 }
 
-/* --- Config Panel Styling --- */
-#config {
-    display: flex;
-    gap: 30px;
-}
-
-.setting {
+.control-group {
+    pointer-events: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: white;
+    background: transparent; /* Transparent background */
+    padding: 0.5rem;
+    min-width: 120px;
+    /* Removed blur backdrop-filter */
+    
+    /* Added text shadow so labels are readable on bright red/green */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8); 
 }
 
-.setting label {
-    font-size: 1rem;
-    margin-bottom: 5px;
-    text-align: center;
-}
-
-.delay-display {
-    font-family: monospace;
-    font-size: 1.2em;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.button-group {
-    display: flex;
-    gap: 5px;
-}
-
-/* Styling for the small +/- buttons */
-.setting button {
-    padding: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
-    border: 2px solid white;
-    background-color: rgba(0, 0, 0, 0.4);
-    color: white;
-    width: 50px;
-    height: 50px; /* Make them touch-friendly squares */
-    box-sizing: border-box;
-    border-radius: 5px;
-}
-
-/* --- Main Button Styling (Full Screen/Pause) --- */
-#main-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-#main-buttons button {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    border: 3px solid white;
-    background-color: rgba(0, 0, 0, 0.4);
-    color: white;
-    border-radius: 5px;
-    min-height: 50px;
-}
-
-/* --- Stats Output Styling --- */
-#stats-container {
+.label-row {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--text-white);
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    min-width: 80px;
+    align-items: center;
 }
 
-#probability-display, #duration-timer {
-    font-size: 16px;
-    color: white;
-    font-family: monospace;
+#floor-value, #ceiling-value {
     font-weight: bold;
-    z-index: 1001;
-    visibility: hidden;
-    text-shadow: 1px 1px 2px black;
+    font-size: 1.1rem;
 }
 
-/* --- MOBILE RESPONSIVENESS --- */
-@media (max-width: 768px) {
-    #controls {
-        justify-content: center; /* Center everything on mobile */
-        padding: 10px;
-        background: rgba(0,0,0,0.8); /* Darker background on mobile controls */
+.button-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--text-white);
+    color: var(--text-white);
+    font-weight: bold;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 4px;
+    min-width: 44px;
+    min-height: 44px;
+    /* Added shadow to buttons for readability */
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8); 
+}
+
+button:active {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.actions {
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+/* --- RESPONSIVE LOGIC --- */
+
+/* 1. Mobile Portrait */
+@media (max-width: 600px) {
+    .controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: space-evenly;
+        /* Background removed */
+    }
+    
+    .control-group {
+        flex: 1 1 40%;
     }
 
-    #config {
-        width: 100%;
-        justify-content: space-around; /* Spread floor/ceiling controls */
-        order: 1; /* Config goes first */
+    .actions {
+        flex: 1 1 100%;
+    }
+    
+    .actions button {
+        flex: 1;
+    }
+    
+    #action-text {
+        font-size: 18vw;
+    }
+}
+
+/* 2. Mobile Landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        flex-direction: row;
     }
 
-    #main-buttons {
-        width: 100%;
+    .controls {
+        position: relative;
+        bottom: auto;
+        width: 160px;
+        height: 100vh;
+        flex-direction: column;
         justify-content: center;
-        order: 2; /* Buttons go second */
-    }
-    
-    #main-buttons button {
-        flex: 1; /* Buttons stretch to fill width */
+        overflow-y: auto;
+        padding: 0.5rem;
+        /* Background and border removed */
     }
 
-    #stats-container {
-        position: absolute;
-        bottom: 15px; /* Adjust slightly for visual balance */
-        right: 15px;
-        pointer-events: none; /* Don't block clicks */
-        align-items: flex-end;
-        order: 3;
+    .control-group {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        /* Added extra padding for touch in landscape sidebar */
+        padding: 1rem 0.5rem; 
+    }
+
+    .actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+
+    #action-text {
+        font-size: 15vh; 
+        width: 100%;
+        padding: 0 1rem;
+        /* Ensure text doesn't overlap the sidebar area visually */
+        margin-right: 160px; 
     }
     
-    /* Adjust text size for small screens */
-    #instruction {
-        font-size: 18vw; 
+    .display-area {
+       /* In landscape, the text needs to shift left so it's centered in the *visible* space, not the whole screen width */
+       justify-content: flex-start;
     }
 }
