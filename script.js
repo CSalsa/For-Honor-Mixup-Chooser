@@ -1,261 +1,99 @@
-/* script.js */
-const body = document.body;
-const instruction = document.getElementById('instruction');
-const startStopBtn = document.getElementById('start-stop-btn');
-const signalBox = document.getElementById('signal-box'); 
-const durationTimerDisplay = document.getElementById('duration-timer');
-const probabilityDisplay = document.getElementById('probability-display'); 
-const floorDisplay = document.getElementById('floor-display');
-const ceilingDisplay = document.getElementById('ceiling-display');
-
-let timer; 
-let counterInterval; 
-let startTime = 0;
+// State Variables
+let floor = 1.0; 
+let ceiling = 5.0; 
 let isRunning = false;
+let timeoutId = null;
 
-// Text Constants
-const INSTRUCTION_MIXUP = 'DO A MIX-UP!';
-const INSTRUCTION_COMMIT = 'I COMMIT!';
+// DOM Elements
+const elDisplay = document.getElementById('main-display');
+const elText = document.getElementById('action-text');
+const elFloorVal = document.getElementById('floor-value');
+const elCeilingVal = document.getElementById('ceiling-value');
+const btnPause = document.getElementById('btn-pause');
 
-// Defined constraints (Variables for Floor/Ceiling controls)
-let MIN_DELAY = 1000; // 1 second (Initial Floor)
-let MAX_DELAY = 5000; // 5 seconds (Initial Ceiling)
-let MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2; 
-const SIGMA = 850; 
+// Options Config
+const options = [
+    { text: "I COMMIT!", color: "var(--bg-green)" },
+    { text: "DO A MIX-UP!", color: "var(--bg-red)" }
+];
 
-let lastChoiceWasRed = null;
+// Helper
+const formatTime = (val) => val.toFixed(1);
 
-// --- Utility Functions ---
-
-// Function for CONTROLS (S.M format)
-function formatDelayControls(ms) {
-    const seconds = Math.floor(ms / 1000);
-    const tenthsOfSecond = Math.floor((ms % 1000) / 100); 
-    return `${seconds}.${tenthsOfSecond}`;
+// Update UI
+function updateUI() {
+    elFloorVal.textContent = formatTime(floor);
+    elCeilingVal.textContent = formatTime(ceiling);
 }
 
-// Function for TIMER DISPLAY (S.MMM format)
-function formatDelayTimer(ms) {
-    const seconds = Math.floor(ms / 1000);
-    const milliseconds = ms % 1000;
-    const formattedMilliseconds = String(milliseconds).padStart(3, '0');
-    return `${seconds}.${formattedMilliseconds}`;
+// Logic
+function getRandomTime(min, max) {
+    return (Math.random() * (max - min) + min) * 1000;
 }
 
-// --- Delay Change Control Logic ---
-
-function changeDelay(target, step) {
-    let newDelay;
-    if (target === 'floor') {
-        newDelay = MIN_DELAY + step;
-        // Constraint 1: Floor minimum is 0.5 seconds (500ms)
-        if (newDelay < 500) {
-            return;
-        }
-        // Constraint 2: Floor must be at most 0.5 seconds less than the ceiling.
-        if (newDelay > MAX_DELAY - 500) {
-            return;
-        }
-
-        MIN_DELAY = newDelay;
-        floorDisplay.textContent = formatDelayControls(MIN_DELAY);
-    } else if (target === 'ceiling') {
-        newDelay = MAX_DELAY + step;
-        // Constraint 1: Ceiling maximum is 9.5 seconds (9500ms)
-        if (newDelay > 9500) {
-            return;
-        }
-        // Constraint 2: Ceiling must be at least 0.5 seconds greater than the floor.
-        if (newDelay < MIN_DELAY + 500) {
-            return;
-        }
-
-        MAX_DELAY = newDelay;
-        ceilingDisplay.textContent = formatDelayControls(MAX_DELAY);
-    }
-    
-    MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2;
-    if (isRunning) {
-        stopSignals();
-        startSignals();
-    }
-}
-
-// --- Normal Distribution Function (For Next Delay) ---
-
-function getRandomNormalDelay() {
-    let u = 0, v = 0;
-    while(u === 0) u = Math.random();
-    while(v === 0) v = Math.random();
-    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v); 
-    
-    let randomDelay = z * SIGMA + MEAN_DELAY;
-    randomDelay = Math.max(MIN_DELAY, Math.min(MAX_DELAY, randomDelay));
-
-    return Math.floor(randomDelay);
-}
-
-// --- Piecewise Linear Probability Calculation (For Visualization) ---
-
-function getLinearProbability(elapsedTime) {
-    const t = elapsedTime;
-    let probabilityPercent = 0;
-
-    const T1 = MIN_DELAY; 
-    const P1 = 20;   
-    const T_MEAN = MEAN_DELAY; 
-    const P_MEAN = 30;
-    const T5 = MAX_DELAY; 
-    const P5 = 20;   
-
-    if (t < T1) {
-        probabilityPercent = 0;
-    } else if (t >= T1 && t <= T_MEAN) {
-        const slope = (P_MEAN - P1) / (T_MEAN - T1);
-        probabilityPercent = P1 + slope * (t - T1);
-
-    } else if (t > T_MEAN && t <= T5) {
-        const slope = (P5 - P_MEAN) / (T5 - T_MEAN);
-        probabilityPercent = P_MEAN + slope * (t - T_MEAN);
-
-    } else if (t > T5) {
-        probabilityPercent = 0;
-    }
-
-    return Math.round(probabilityPercent);
-}
-
-// --- Timer Utility Functions ---
-
-function hideTimerDisplay() {
-    durationTimerDisplay.style.visibility = 'hidden';
-    probabilityDisplay.style.visibility = 'hidden'; 
-}
-
-function showTimerDisplay() {
-    durationTimerDisplay.style.visibility = 'visible';
-    probabilityDisplay.style.visibility = 'visible';
-}
-
-function startCounter() {
-    startTime = Date.now();
-    clearInterval(counterInterval); 
-    counterInterval = setInterval(updateCounter, 10);
-}
-
-function stopCounter() {
-    clearInterval(counterInterval);
-    durationTimerDisplay.textContent = '0.000';
-    probabilityDisplay.textContent = '0%';
-}
-
-function updateCounter() {
+function triggerNext() {
     if (!isRunning) return;
+
+    const choice = options[Math.floor(Math.random() * options.length)];
     
-    const elapsed = Date.now() - startTime;
-    
-    const dynamicPercent = getLinearProbability(elapsed);
-    probabilityDisplay.textContent = `${dynamicPercent}%`;
-    
-    if (elapsed >= MAX_DELAY) {
-        clearTimeout(timer);
-        changeSignal(true); 
-        return;
-    }
-    
-    durationTimerDisplay.textContent = formatDelayTimer(elapsed);
+    // Apply colors to the MAIN DISPLAY area
+    elDisplay.style.backgroundColor = choice.color;
+    elText.textContent = choice.text;
+
+    const delay = getRandomTime(floor, ceiling);
+    timeoutId = setTimeout(triggerNext, delay);
 }
 
-// --- Fullscreen Toggle ---
+function togglePlay() {
+    if (isRunning) {
+        isRunning = false;
+        clearTimeout(timeoutId);
+        btnPause.textContent = "Start";
+        elDisplay.style.backgroundColor = "transparent"; // Reverts to body grey
+        elText.textContent = "PAUSED";
+    } else {
+        isRunning = true;
+        btnPause.textContent = "Pause";
+        triggerNext(); 
+    }
+}
 
-function toggleFullscreen() {
+function adjustFloor(delta) {
+    const newVal = floor + delta;
+    if (newVal >= 0.1 && newVal <= ceiling) {
+        floor = newVal;
+        updateUI();
+    }
+}
+
+function adjustCeiling(delta) {
+    const newVal = ceiling + delta;
+    if (newVal >= floor) {
+        ceiling = newVal;
+        updateUI();
+    }
+}
+
+// Listeners
+document.getElementById('btn-floor-inc').addEventListener('click', () => adjustFloor(0.5));
+document.getElementById('btn-floor-dec').addEventListener('click', () => adjustFloor(-0.5));
+document.getElementById('btn-ceiling-inc').addEventListener('click', () => adjustCeiling(0.5));
+document.getElementById('btn-ceiling-dec').addEventListener('click', () => adjustCeiling(-0.5));
+btnPause.addEventListener('click', togglePlay);
+
+document.getElementById('btn-fullscreen').addEventListener('click', () => {
     if (!document.fullscreenElement) {
-        body.requestFullscreen().catch(err => {
-            console.error(`Error enabling fullscreen: ${err.message}`);
-        });
+        document.documentElement.requestFullscreen().catch(e => console.log(e));
     } else {
         document.exitFullscreen();
     }
-}
+});
 
-// --- Signal Controls ---
-
-function startSignals() {
-    if (isRunning) return; 
-    isRunning = true;
-    startStopBtn.textContent = 'Pause';
-    instruction.textContent = 'GET READY';
-    
-    lastChoiceWasRed = null; 
-    
-    hideTimerDisplay();
-    startCounter(); 
-    
-    timer = setTimeout(changeSignal, 1500);
-}
-
-function stopSignals() {
-    clearTimeout(timer);
-    stopCounter(); 
-    isRunning = false;
-    startStopBtn.textContent = 'Start';
-    signalBox.style.backgroundColor = 'black'; 
-    instruction.textContent = 'PAUSED';
-    hideTimerDisplay();
-    lastChoiceWasRed = null; 
-}
-
-function toggleSignals() {
-    if (isRunning) {
-        stopSignals();
-    } else {
-        startSignals();
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { 
+        e.preventDefault(); 
+        togglePlay();
     }
-}
+});
 
-function changeSignal(forceSwitch = false) {
-    if (!isRunning) return;
-
-    let nextIsRed;
-    const nextDelay = getRandomNormalDelay();
-    if (forceSwitch) {
-        nextIsRed = !lastChoiceWasRed;
-    } else {
-        nextIsRed = Math.random() < 0.5;
-        const currentElapsed = Date.now() - startTime;
-        if (nextIsRed === lastChoiceWasRed && currentElapsed > (MAX_DELAY - 1000)) {
-            nextIsRed = !lastChoiceWasRed;
-        }
-    }
-    
-    if (nextIsRed !== lastChoiceWasRed) {
-        startCounter();
-    }
-    
-    if (nextIsRed) {
-        signalBox.style.backgroundColor = 'red';
-        instruction.textContent = INSTRUCTION_MIXUP;
-    } else {
-        signalBox.style.backgroundColor = 'green';
-        instruction.textContent = INSTRUCTION_COMMIT;
-    }
-    
-    showTimerDisplay();
-    lastChoiceWasRed = nextIsRed;
-
-    clearTimeout(timer);
-    timer = setTimeout(changeSignal, nextDelay);
-}
-
-// --- Initialization ---
-
-// MIN_DELAY and MAX_DELAY are correctly set at the top of the script.
-// Recalculate mean in case MIN_DELAY or MAX_DELAY were changed above.
-MEAN_DELAY = (MIN_DELAY + MAX_DELAY) / 2;
-// Initialize display with current values for the user controls
-if (floorDisplay && ceilingDisplay) {
-    floorDisplay.textContent = formatDelayControls(MIN_DELAY);
-    ceilingDisplay.textContent = formatDelayControls(MAX_DELAY);
-}
-
-startSignals();
+updateUI();
