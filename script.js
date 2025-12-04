@@ -1,7 +1,7 @@
 const body = document.body;
 const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
-const waitBtn = document.getElementById('wait-btn');
+const waitBtn = document.getElementById('wait-btn'); // NOTE: Make sure to add id="wait-btn" to HTML
 const signalBox = document.getElementById('signal-box'); 
 const durationTimerDisplay = document.getElementById('duration-timer');
 const probabilityDisplay = document.getElementById('probability-display'); 
@@ -52,10 +52,12 @@ function toggleWaitChoice() {
         waitBtn.textContent = "Remove Wait Choice";
     } else {
         waitBtn.textContent = "Add Wait Choice";
-        // If we currently have 'Wait' active but just disabled it, force a change immediately
+        
+        // OPTIMIZATION: If we are currently "Waiting" but just removed that option...
+        // ... force an immediate switch to Commit or Mixup.
         if (lastChoice === 2 && isRunning) {
-            stopSignals();
-            startSignals();
+            clearTimeout(timer); // Cancel the pending schedule
+            changeSignal(true); // Force switch immediately
         }
     }
 }
@@ -229,6 +231,8 @@ function changeSignal(forceSwitch = false) {
     if (forceSwitch) {
         // Must be different from last
         const available = options.filter(opt => opt !== lastChoice);
+        // EDGE CASE: If we just removed Wait (2) and lastChoice was 2, 
+        // options are [0, 1]. 'available' is [0, 1]. It picks a valid new one.
         nextChoice = pick(available);
     } else {
         // Pure random
@@ -255,7 +259,7 @@ function changeSignal(forceSwitch = false) {
         signalBox.style.backgroundColor = 'red';
         instruction.textContent = INSTRUCTION_MIXUP;
     } else if (nextChoice === 2) { // Yellow
-        signalBox.style.backgroundColor = '#ffc400'; // Deep Amber/Gold for contrast
+        signalBox.style.backgroundColor = '#ffc400'; 
         instruction.textContent = INSTRUCTION_WAIT;
     }
     
