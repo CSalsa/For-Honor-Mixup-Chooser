@@ -1,212 +1,219 @@
 /* style.css */
-:root {
-    --bg-green: #00cc00; 
-    --bg-red: #ff0000;
-    --bg-neutral: #333333;
-    --text-white: #ffffff;
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    position: relative; 
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center; 
+    background-color: transparent; 
 }
 
-* {
+#signal-box {
+    position: absolute; 
+    top: 0;
+    left: 0;
+    height: 100vh; 
+    width: 100%;
+    background-color: black; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    transition: background-color 0.1s ease-in-out; 
+    z-index: 1;
+}
+
+#instruction {
+    color: white; 
+    font-family: Arial, sans-serif;
+    /* Changed from fixed 8em to viewport based for basic responsiveness */
+    font-size: 15vw; 
+    font-weight: bold; 
+    text-align: center;
+    user-select: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
+    z-index: 3; 
+    pointer-events: none; /* Let clicks pass through text */
+}
+
+#controls {
+    position: fixed; 
+    bottom: 0;
+    left: 0;
+    width: 100%; 
+    z-index: 1000; 
+    padding: 15px 30px; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Standard System Fonts */
+    pointer-events: none; /* Let clicks pass through control area background */
+}
+
+/* --- Main Button Styling (Full Screen/Pause) --- */
+
+#main-buttons {
+    display: flex;
+    justify-content: center; 
+    flex-grow: 1;
+    pointer-events: auto; /* Re-enable clicks */
+}
+
+#main-buttons button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border: 3px solid white;
+    background-color: rgba(0, 0, 0, 0.4); 
+    color: white;
+    touch-action: manipulation; /* Improves mobile touch response */
+}
+
+/* --- Config Panel Styling --- */
+
+#config {
+    display: flex;
+    gap: 30px; 
+    pointer-events: auto; /* Re-enable clicks */
+}
+
+.setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-shadow: 1px 1px 2px black; /* Added shadow for readability */
+}
+
+.setting label {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.delay-display {
+    font-family: monospace;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+/* Styling for the small +/- buttons */
+.setting button {
+    padding: 5px 15px; 
+    margin: 3px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border: 3px solid white;
+    background-color: rgba(0, 0, 0, 0.4); 
+    color: white;
+    width: 70px; 
+    box-sizing: border-box;
     touch-action: manipulation;
 }
 
-body {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+/* --- Validation Output Styling --- */
+
+#stats-wrapper {
     display: flex;
     flex-direction: column;
-    background-color: var(--bg-neutral);
-}
-
-/* --- Main Display Area --- */
-
-.display-area {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.1s linear; /* Faster transition for snapper feel */
-    width: 100%;
-}
-
-#action-text {
-    font-size: 15vw;
-    font-weight: 900;
-    color: var(--text-white);
-    text-transform: uppercase;
-    text-align: center;
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
-    pointer-events: none;
-    user-select: none;
-}
-
-/* --- Stats Display (New) --- */
-.stats-container {
-    position: absolute;
-    bottom: 20px; /* Positioned just above controls */
-    right: 20px;
-    color: var(--text-white);
-    font-family: 'Courier New', Courier, monospace; /* Monospace for numbers */
-    font-weight: bold;
-    font-size: 1.2rem;
-    text-shadow: 2px 2px 2px rgba(0,0,0,1); /* Heavy shadow for visibility */
-    display: flex;
-    gap: 1rem;
-    z-index: 5; /* Sit below controls */
+    align-items: flex-end; /* Align right */
     pointer-events: none;
 }
 
-/* --- Controls Footer --- */
-
-.controls {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 1rem;
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    pointer-events: none;
-    z-index: 10;
+#probability-display, #duration-timer {
+    position: static; 
+    margin-left: 10px;
+    padding: 0;
+    font-size: 1.5rem; /* Increased size for readability */
+    color: white; 
+    font-family: monospace; 
+    z-index: 1001; 
+    visibility: hidden;
+    text-shadow: 2px 2px 2px black;
 }
 
-.control-group {
-    pointer-events: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: transparent;
-    padding: 0.5rem;
-    min-width: 120px;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-}
+/* --- RESPONSIVE MEDIA QUERIES --- */
 
-.label-row {
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-    color: var(--text-white);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#floor-value, #ceiling-value {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.button-row {
-    display: flex;
-    gap: 0.5rem;
-}
-
-button {
-    background: transparent;
-    border: 2px solid var(--text-white);
-    color: var(--text-white);
-    font-weight: bold;
-    padding: 0.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    border-radius: 4px;
-    min-width: 44px;
-    min-height: 44px;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-}
-
-button:active {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.actions {
-    flex-direction: row;
-    gap: 0.5rem;
-}
-
-/* --- RESPONSIVE LOGIC --- */
-
-/* 1. Mobile Portrait */
-@media (max-width: 600px) {
-    .controls {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: space-evenly;
-    }
-    
-    .control-group {
-        flex: 1 1 40%;
-    }
-
-    .actions {
-        flex: 1 1 100%;
-    }
-    
-    .actions button {
-        flex: 1;
-    }
-    
-    #action-text {
-        font-size: 18vw;
-    }
-
-    .stats-container {
-        bottom: 120px; /* Move up so controls don't cover it */
-        right: 10px;
-        font-size: 1rem;
-    }
-}
-
-/* 2. Mobile Landscape */
-@media (max-height: 500px) and (orientation: landscape) {
-    body {
-        flex-direction: row;
-    }
-
-    .controls {
-        position: relative;
-        bottom: auto;
-        width: 160px;
-        height: 100vh;
-        flex-direction: column;
+/* 1. Mobile Portrait: Prevent overlapping */
+@media (max-width: 768px) {
+    #controls {
+        flex-wrap: wrap; /* Allow buttons to wrap to next line */
         justify-content: center;
-        overflow-y: auto;
-        padding: 0.5rem;
+        gap: 10px;
+        padding: 10px;
     }
 
-    .control-group {
+    #config {
+        gap: 10px;
         width: 100%;
-        margin-bottom: 0.5rem;
-        padding: 1rem 0.5rem;
-    }
-
-    .actions {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .actions button {
-        width: 100%;
-    }
-
-    #action-text {
-        font-size: 15vh; 
-        width: 100%;
-        padding: 0 1rem;
-        margin-right: 160px;
+        justify-content: space-around;
+        order: 1; /* Config on top */
     }
     
-    .display-area {
-       justify-content: flex-start;
+    #main-buttons {
+        width: 100%;
+        order: 2; /* Buttons below */
     }
 
-    .stats-container {
-        bottom: 10px;
-        right: 170px; /* Move to left of sidebar */
+    #main-buttons button {
+        flex: 1; /* Stretch buttons */
+        padding: 10px;
+        font-size: 1.2em;
+    }
+    
+    #stats-wrapper {
+        position: absolute;
+        bottom: 180px; /* Float above the controls */
+        right: 10px;
+        order: 0;
+    }
+}
+
+/* 2. Mobile Landscape: Sidebar Layout */
+@media (max-height: 500px) and (orientation: landscape) {
+    #instruction {
+        font-size: 15vh; /* Scale based on height so it fits */
+        width: 70%; /* Leave room for sidebar */
+        margin-right: 20%;
+    }
+
+    #controls {
+        left: auto; /* Remove left anchor */
+        right: 0;   /* Anchor to right */
+        top: 0;     /* Anchor to top */
+        bottom: auto;
+        
+        width: 200px; /* Fixed sidebar width */
+        height: 100vh; /* Full height */
+        
+        flex-direction: column; /* Stack vertically */
+        justify-content: center;
+        overflow-y: auto; /* Scroll if needed */
+        background-color: rgba(0,0,0,0.2); /* Slight background to separate */
+    }
+
+    #config {
+        flex-direction: column; /* Stack floor/ceiling vertically */
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    #main-buttons {
+        flex-direction: column; /* Stack buttons */
+        width: 100%;
+    }
+
+    #main-buttons button {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    #stats-wrapper {
+        position: static; /* Put inside flow of sidebar */
+        align-items: center;
+        margin-top: 20px;
     }
 }
