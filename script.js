@@ -1,4 +1,3 @@
-/* script.js */
 const body = document.body;
 const instruction = document.getElementById('instruction');
 const startStopBtn = document.getElementById('start-stop-btn');
