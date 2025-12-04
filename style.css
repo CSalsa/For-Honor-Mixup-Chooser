@@ -27,8 +27,8 @@ body {
 #instruction {
     color: white; 
     font-family: Arial, sans-serif;
-    /* DYNAMIC SIZING */
-    font-size: 15vw; 
+    /* REDUCED SIZE: 15vw -> 11vw to prevent wrapping and overlapping buttons */
+    font-size: 11vw; 
     font-weight: bold; 
     text-align: center;
     user-select: none;
@@ -60,7 +60,6 @@ body {
 #main-buttons {
     display: flex;
     gap: 10px;
-    /* Allows buttons to stack if screen is too narrow */
     flex-wrap: wrap; 
     justify-content: flex-end;
 }
@@ -74,6 +73,12 @@ body {
     color: white;
     font-weight: bold;
     touch-action: manipulation;
+}
+
+/* STABILITY FIX: Fixed width prevents layout jump when text changes */
+#wait-btn {
+    min-width: 220px; 
+    text-align: center;
 }
 
 /* --- Config Panel Styling --- */
@@ -138,6 +143,7 @@ body {
 /* --- MOBILE LANDSCAPE SPECIFIC --- */
 @media (max-height: 500px) and (orientation: landscape) {
     #instruction {
+        /* Even smaller on landscape so it fits between sidebars */
         font-size: 10vh; 
     }
 
@@ -152,13 +158,19 @@ body {
     
     #main-buttons {
         order: 2; 
-        max-width: 250px; /* Force wrapping on side if needed */
+        max-width: 250px; 
     }
 
     #main-buttons button {
         padding: 8px 15px;
         font-size: 1em;
         margin-bottom: 5px;
+    }
+    
+    /* Ensure the fixed width doesn't break small screens */
+    #wait-btn {
+        min-width: 0; /* Reset for flex context if needed */
+        width: 100%; /* Fill sidebar */
     }
     
     .setting button {
@@ -195,9 +207,14 @@ body {
     }
     
     #main-buttons button {
-        flex: 1 1 30%; /* Allow buttons to share row but wrap if needed */
-        font-size: 1em;
-        padding: 10px;
+        flex: 1 1 30%; 
+        font-size: 0.9em; /* Slightly smaller text to fit all 3 buttons */
+        padding: 10px 5px;
+    }
+    
+    /* On portrait mobile, remove fixed width so it fits in the flex row */
+    #wait-btn {
+        min-width: 0;
     }
     
     #stats-container {
