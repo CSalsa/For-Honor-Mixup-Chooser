@@ -75,9 +75,9 @@ body {
     touch-action: manipulation;
 }
 
-/* STABILITY FIX: Tighter width (170px) to fit "Remove Wait Choice" snugly */
+/* STABILITY FIX: Tighter width (150px) to fit "Remove Wait Choice" snugly */
 #wait-btn {
-    min-width: 170px; 
+    min-width: 150px; 
     text-align: center;
 }
 
@@ -222,3 +222,4 @@ body {
         z-index: 2000;
     }
 }
+
