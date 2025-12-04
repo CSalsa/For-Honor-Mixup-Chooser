@@ -1,16 +1,3 @@
-Reinforce: You are completely right to flag that empty space. Since the "Remove Wait Choice" string is the longest possible text for that button, the button should be barely wider than that text. The current 220px width (which I set to prevent jumping) was too conservative and created that "gap" you see in the screenshot.
-
-Correct: I have reduced the base min-width of the wait button from 220px to 170px. I also tightened the button padding in landscape mode from 15px to 10px.
-
-Explain: This 170px width is calculated to fit "Remove Wait Choice" snugly. This ensures the button remains stable (doesn't jump) when toggling, but eliminates the wasted yellow space you noticed on the phone.
-
-Here is the updated style.css. The HTML and JS remain the same.
-
-style.css
-(Updated with tighter button sizing)
-
-CSS
-
 body {
     margin: 0;
     overflow: hidden;
